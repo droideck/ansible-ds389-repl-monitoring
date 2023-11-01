@@ -1,0 +1,3 @@
+---
+replication_lag_threshold: 10
+critical_threshold: 20

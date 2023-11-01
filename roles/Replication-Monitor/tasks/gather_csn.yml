@@ -1,0 +1,19 @@
+---
+- name: Check if access log exists
+  stat:
+    # path: PATH_TO_ACCESS_LOG
+  register: access_log
+
+- name: Fail if access log does not exist
+  fail:
+    msg: "Access log does not exist"
+  when: not access_log.stat.exists
+
+
+- name: Gather CSN values from access log
+  # shell: grep CSN from logfile
+  register: csn_values
+
+- name: Parse CSN value
+  set_fact:
+    # csn_values: CSN from the raw output

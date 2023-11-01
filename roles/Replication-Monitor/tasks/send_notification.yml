@@ -1,0 +1,5 @@
+---
+- name: Send notification
+  # Need to decide how and where to send notification. Using placeholder for now
+  command: "send-notification-script.py"
+  when: replication_lag.stdout | int > critical_threshold

@@ -1,0 +1,12 @@
+---
+- name: Gather CSN values from access logs
+  include_tasks: gather_csn.yml
+
+- name: Compare CSN values and calculate replication lag
+  include_tasks: compare_csn.yml
+
+- name: Log instances of replication lag beyond the specified threshold
+  include_tasks: log_replication_lag.yml
+
+- name: Send notifications if critical issues are found
+  include_tasks: send_notification.yml

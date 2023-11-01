@@ -1,0 +1,8 @@
+ds389_servers:
+  hosts:
+    ds389_instance_1:
+      ansible_host: 192.168.1.101
+      ansible_user: admin
+    ds389_instance_2:
+      ansible_host: 192.168.1.102
+      ansible_user: admin

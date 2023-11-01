@@ -1,0 +1,5 @@
+---
+- name: Log replication lag
+  # Log instances of replication lag beyond the specified threshold. Python file?
+  command: "log-replication-lag.py"
+  when: replication_lag.stdout | int > replication_lag_threshold

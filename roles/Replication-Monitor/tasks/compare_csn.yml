@@ -1,0 +1,5 @@
+---
+- name: Compare CSN values
+  # Need to decide the best way to compare CSN values. For now, just use a Python script placeholder.
+  command: "csn-comparison-script.py {{ csn_value }}"
+  register: replication_lag
