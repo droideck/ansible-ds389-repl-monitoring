@@ -1,0 +1,44 @@
+---
+- name: Setup Environment for 389 DS Replication Monitoring
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Test connectivity to all hosts
+      ansible.builtin.ping:
+
+    - name: Ensure necessary packages are installed
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - rsync             # For file synchronization
+        - openldap-clients  # For LDAP operations - ? - or will we use python scripts?
+        - curl              # For making HTTP requests, if needed for notifications.
+        - jq                # For processing JSON data.
+      when: ansible_os_family == "RedHat"
+
+    - name: Ensure log directory exists
+      ansible.builtin.file:
+        path: "{{ replication_monitoring_log_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Test LDAP connectivity
+      community.general.ldap_search:
+        bind_dn: "{{ replication_monitoring_bind_dn }}"
+        bind_pw: "{{ replication_monitoring_bind_pw }}"
+        dn: "dc=example,dc=com"
+        server_uri: ldap://{{ ansible_host }}
+      register: ldap_connectivity
+
+    - name: Check LDAP connectivity
+      ansible.builtin.fail:
+        msg: "Failed to connect to LDAP server"
+      when: ldap_connectivity.failed
+
+    # debugging
+    - name: Check replication lag variable
+      ansible.builtin.debug:
+        msg: "The replication lag threshold for this group is {{ replication_monitoring_lag_threshold }} seconds."
+

@@ -1,6 +1,6 @@
 ---
 - name: Monitor Replication
-  hosts: ds389_servers
+  hosts: all
   become: yes
 
   roles:

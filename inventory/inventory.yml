@@ -1,0 +1,33 @@
+all:
+  children:
+    production:
+      vars:
+        replication_monitoring_log_dir: '/var/log/ds389-replication-monitor'
+        replication_monitoring_lag_threshold: 60
+        replication_monitoring_bind_dn: "cn=Directory Manager"
+        replication_monitoring_bind_pw: "Password123"
+      hosts:
+        ds389_instance_1:
+          ansible_host: 192.168.2.101
+          ansible_user: root
+          ansible_password: Password123
+        ds389_instance_2:
+          ansible_host: 192.168.2.102
+          ansible_user: root
+          ansible_password: Password123
+
+    staging:
+      vars:
+        replication_monitoring_log_dir: '/var/log/ds389-replication-monitor'
+        replication_monitoring_lag_threshold: 120
+        replication_monitoring_bind_dn: "cn=Directory Manager"
+        replication_monitoring_bind_pw: "Password123"
+      hosts:
+        ds389_instance_1:
+          ansible_host: 192.168.2.101
+          ansible_user: root
+          ansible_password: Password123
+        ds389_instance_2:
+          ansible_host: 192.168.2.102
+          ansible_user: root
+          ansible_password: Password123
