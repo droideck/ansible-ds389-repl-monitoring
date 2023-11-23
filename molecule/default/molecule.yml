@@ -1,0 +1,11 @@
+---
+platforms:
+  - name: instance
+    image: docker.io/library/fedora:latest
+    pre_build_image: true
+verifier:
+  name: ansible
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .

@@ -41,4 +41,3 @@
     - name: Check replication lag variable
       ansible.builtin.debug:
         msg: "The replication lag threshold for this group is {{ replication_monitoring_lag_threshold }} seconds."
-

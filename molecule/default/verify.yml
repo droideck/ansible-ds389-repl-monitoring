@@ -1,0 +1,28 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Verify connectivity to all hosts
+      ansible.builtin.ping:
+
+    - name: Verify necessary packages are installed on RedHat
+      when: ansible_os_family == "RedHat"
+      block:
+        - name: Check package {{ item }}
+          ansible.builtin.package:
+            name: "{{ item }}"
+            state: present
+          loop:
+            - rsync
+            - openldap-clients
+            - curl
+            - jq
+          register: package_status
+          failed_when: package_status is failed
+
+    - name: Verify log directory exists with correct permissions
+      ansible.builtin.stat:
+        path: "{{ replication_monitoring_log_dir }}"
+      register: log_dir_status
+      failed_when: not log_dir_status.stat.exists or log_dir_status.stat.mode != '0755'
