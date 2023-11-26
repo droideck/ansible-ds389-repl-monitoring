@@ -24,19 +24,6 @@
         state: directory
         mode: '0755'
 
-    - name: Test LDAP connectivity
-      community.general.ldap_search:
-        bind_dn: "{{ replication_monitoring_bind_dn }}"
-        bind_pw: "{{ replication_monitoring_bind_pw }}"
-        dn: "dc=example,dc=com"
-        server_uri: ldap://{{ ansible_host }}
-      register: ldap_connectivity
-
-    - name: Check LDAP connectivity
-      ansible.builtin.fail:
-        msg: "Failed to connect to LDAP server"
-      when: ldap_connectivity.failed
-
     # debugging
     - name: Check replication lag variable
       ansible.builtin.debug:

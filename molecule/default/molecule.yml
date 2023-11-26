@@ -1,11 +1,25 @@
 ---
+driver:
+  name: docker
+
 platforms:
-  - name: instance
-    image: docker.io/library/fedora:latest
-    pre_build_image: true
-verifier:
+   - cgroupns_mode: host
+     command: /lib/systemd/systemd
+     image: geerlingguy/docker-fedora38-ansible:latest
+     name: instance
+     pre_build_image: true
+     privileged: true
+     volumes:
+       - /sys/fs/cgroup:/sys/fs/cgroup:rw
+
+provisioner:
   name: ansible
-lint: |
-  set -e
-  yamllint .
-  ansible-lint .
+  playbooks:
+    converge: converge.yml
+  inventory:
+    group_vars:
+      all:
+        replication_monitoring_log_dir: '/var/log/ds389-replication-monitor'
+        replication_monitoring_lag_threshold: 120
+
+
