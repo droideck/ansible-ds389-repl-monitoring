@@ -1,19 +1,23 @@
----
-- name: Check if access log exists
-  stat:
-    # path: PATH_TO_ACCESS_LOG
-  register: access_log
+- name: Find all log files in the directory
+  ansible.builtin.find:
+    paths: "/var/log/dirsrv/slapd-localhost"
+    patterns: "access*"
+  register: log_files
 
-- name: Fail if access log does not exist
-  fail:
-    msg: "Access log does not exist"
-  when: not access_log.stat.exists
+- name: Copy dslogs script to the target machine
+  ansible.builtin.copy:
+    src: "./dslogs"
+    dest: "/tmp/dslogs"
+    mode: "0755"
 
-
-- name: Gather CSN values from access log
-  # shell: grep CSN from logfile
+- name: Parse CSN values from log files using dslogs script
+  ansible.builtin.command: "python3 /tmp/dslogs {{ log_files.files | map(attribute='path') | join(' ') }}"
   register: csn_values
 
 - name: Parse CSN value
   set_fact:
-    # csn_values: CSN from the raw output
+    csn_values: "{{ csn_values.stdout }}"
+
+- name: Debug CSN values
+  ansible.builtin.debug:
+    var: csn_values

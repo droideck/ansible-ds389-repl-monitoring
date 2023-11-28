@@ -1,7 +1,5 @@
----
 - name: Monitor Replication
   hosts: all
   become: yes
-
   roles:
-    - Replication-Monitor
+    - ../roles/Replication-Monitor

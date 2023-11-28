@@ -3,14 +3,22 @@ driver:
   name: docker
 
 platforms:
-   - cgroupns_mode: host
-     command: /lib/systemd/systemd
-     image: geerlingguy/docker-fedora38-ansible:latest
-     name: instance
-     pre_build_image: true
-     privileged: true
-     volumes:
-       - /sys/fs/cgroup:/sys/fs/cgroup:rw
+  - cgroupns_mode: host
+    command: /lib/systemd/systemd
+    image: geerlingguy/docker-fedora38-ansible:latest
+    name: instance1
+    pre_build_image: true
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+  - cgroupns_mode: host
+    command: /lib/systemd/systemd
+    image: geerlingguy/docker-fedora38-ansible:latest
+    name: instance2
+    pre_build_image: true
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
 
 provisioner:
   name: ansible
