@@ -1,0 +1,197 @@
+#!/usr/bin/python3
+# --- BEGIN COPYRIGHT BLOCK ---
+# Copyright (C) 2023 Red Hat, Inc.
+# All rights reserved.
+#
+# License: GPL (version 3 or any later version).
+# See LICENSE for details.
+# --- END COPYRIGHT BLOCK ---
+
+USAGE="""Tools to parse 389ds access log files from different replicas
+to extract interesting data (like csn, etime and event time) and store it in json file
+Usage: 
+   dslogs replica1_logfile replica2_logfile > output.json
+"""
+
+
+import datetime
+import sys
+import re
+import argparse
+import json
+import logging
+
+class DSLogParser:
+    REGEX_TIMESTAMP = re.compile(r'\[(?P<day>\d*)\/(?P<month>\w*)\/(?P<year>\d*):(?P<hour>\d*):(?P<minute>\d*):(?P<second>\d*)(.(?P<nanosecond>\d*))+\s(?P<tz>[\+\-]\d*)')
+    REGEX_LINE = re.compile(r'\s(?P<quoted>[^= ]+="[^"]*")|(?P<var>[^= ]+=[^\s]+)|(?P<keyword>[^\s]+)')
+    MONTH_LOOKUP = {
+        'Jan': "01",   
+        'Feb': "02",   
+        'Mar': "03",   
+        'Apr': "04",
+        'May': "05",
+        'Jun': "06",
+        'Jul': "07",   
+        'Aug': "08",   
+        'Oct': "09",       
+        'Sep': "10",      
+        'Nov': "11",
+        'Dec': "12",
+    }
+
+
+    class ParserResult:
+        def __init__(self):
+            self.keywords = []
+            self.vars = {}
+            self.raw = None
+            self.timestamp = None
+
+
+    def __init__(self, logname):
+        self.logname = logname
+        self.lineno = 0
+        self.line = None
+
+    def parse_timestamp(self, ts):
+        """Parse a logs timestamps and break it down into its individual parts
+        @param ts - The timestamp string from a log
+        @return - a "datetime" object
+        """
+        try:
+            timedata = DSLogParser.REGEX_TIMESTAMP.match(ts).groupdict()
+        except AttributeError as e:
+            logging.error(f'Failed to parse timestamp {ts} because of {e}')
+            raise e
+        # Now, have to convert month to an int.
+        iso_ts = '{YEAR}-{MONTH}-{DAY}T{HOUR}:{MINUTE}:{SECOND}{TZH}:{TZM}'.format(
+            YEAR=timedata['year'],
+            MONTH=DSLogParser.MONTH_LOOKUP[timedata['month']],
+            DAY=timedata['day'],
+            HOUR=timedata['hour'],
+            MINUTE=timedata['minute'],
+            SECOND=timedata['second'],
+            TZH=timedata['tz'][0:3],
+            TZM=timedata['tz'][3:5],
+            )
+        dt = datetime.datetime.fromisoformat(iso_ts)
+        if timedata['nanosecond']:
+            dt = dt.replace(microsecond=int(int(timedata['nanosecond']) / 1000))
+        return dt
+
+    def parse_line(self):
+        l = self.line.split(']',1)
+        if len(l) != 2:
+            return None
+        result = DSLogParser.REGEX_LINE.findall(l[1])
+        if not result:
+            return None
+        r = DSLogParser.ParserResult()
+        r.timestamp = l[0]+"]"
+        r.raw = result
+        for (a,b,c) in result:
+            if a != '':
+                # Quoted value
+                r2 = a.split('=', 1)
+                r.vars[r2[0]] = r2[1][1:-1]
+            if b != '':
+                # Non Quoted value
+                r2 = b.split('=', 1)
+                r.vars[r2[0]] = r2[1]
+            if c != '':
+                # Plain word
+                r.keywords.append(c)
+        return r
+
+    def action(self, r):
+        print(f'{r.timestamp} {r.keywords} {r.vars}')
+
+    def parse_file(self):
+        with open(self.logname, 'r') as f:
+            for self.line in f:
+                self.lineno += 1
+                try:
+                    r = self.parse_line()
+                    if r:
+                        self.action(r)
+                except Exception as e:
+                    logging.error(f"Skipping non parsable line {self.lineno} ==> {self.line} ==> {e}")
+                    raise e
+                
+class ReplLag:
+    class Parser(DSLogParser):
+        def __init__(self, idx, logfile, result):
+            super().__init__(logfile)
+            self.result = result
+            self.idx = idx
+
+        def action(self, r):
+            try:
+                csn = r.vars['csn']
+                res = self.result
+                dt = self.parse_timestamp(r.timestamp)
+                udt = dt.astimezone(datetime.timezone.utc).timestamp()
+                if res.start_udt is None or res.start_udt > udt:
+                    res.start_udt = udt
+                    res.start_dt = dt
+                if csn not in res.csns:
+                    res.csns[csn] = { }
+                record = {
+                    "logtime": udt,
+                    "etime": r.vars['etime']
+                }
+                res.csns[csn][self.idx] = record
+            except KeyError:
+                pass
+
+    def __init__(self, args, fd):
+        self.logfiles = args.logfiles
+        self.nbfiles = len(args.logfiles)
+        self.args = args
+        self.fd = fd
+        # csns is a dict { csn : { "oldest_logtime": udt, "records" : { log_index {[ lag , etime, file-index, utc-log-time, utc-csb-oldest-log-time ] }
+        #  lag = '*' means that the csn has not been seen in that log file
+        self.csns = {} 
+        self.start_udt = None   # Oldest time seen in logs files (utc timestamp)
+        self.start_dt = None    # Oldest time seen in logs files (timedate object)
+
+    def parse_files(self):
+        # Lets parse the logs files
+        for idx,f in enumerate(self.logfiles):
+            p = ReplLag.Parser(idx, f, self)
+            p.parse_file()
+
+    def jsonprint(self):
+        obj =  {
+             "# comment" : "dslog output (replication lags data)", 
+             "start-time" : str(self.start_dt), 
+             "utc-start-time" : self.start_udt, 
+             "utc-offset" : self.start_dt.utcoffset().total_seconds(), 
+             "log-files" : self.logfiles, 
+             "lag" : self.csns
+        }
+        if self.args.anonymous:
+            obj['log-files'] = list(range(len(self.logfiles)))
+        json.dump(obj, self.fd, indent=4)
+
+
+parser = argparse.ArgumentParser(
+                    prog='dslogs',
+                    description='Access log prser that compute replication lags',
+                    epilog=USAGE)
+
+parser.add_argument('logfiles', nargs="+")           # positional argument
+parser.add_argument('-a', '--anonymous', action='store_true', help="Hide the log file names" )
+parser.add_argument('-o', '--output', help="Output file" )
+args = parser.parse_args()
+
+def doit(fd):
+    log_parser = ReplLag(args, fd)
+    log_parser.parse_files()
+    log_parser.jsonprint()
+
+if args.output:
+    with open(args.output, "w", encoding="utf-8") as fd:
+        doit(fd)
+else:
+        doit(sys.stdout)

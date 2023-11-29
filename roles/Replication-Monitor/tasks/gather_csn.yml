@@ -1,6 +1,6 @@
 - name: Find all log files in the directory
   ansible.builtin.find:
-    paths: "/var/log/dirsrv/slapd-localhost"
+    paths: "/var/log/dirsrv/slapd-supplier1"
     patterns: "access*"
   register: log_files
 
