@@ -19,6 +19,22 @@ platforms:
     privileged: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
+  - cgroupns_mode: host
+    command: /lib/systemd/systemd
+    image: geerlingguy/docker-fedora38-ansible:latest
+    name: instance3
+    pre_build_image: true
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+  - cgroupns_mode: host
+    command: /lib/systemd/systemd
+    image: geerlingguy/docker-fedora38-ansible:latest
+    name: instance4
+    pre_build_image: true
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
 
 provisioner:
   name: ansible

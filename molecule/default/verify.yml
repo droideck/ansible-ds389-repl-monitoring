@@ -26,3 +26,16 @@
         path: "{{ replication_monitoring_log_dir }}"
       register: log_dir_status
       failed_when: not log_dir_status.stat.exists or log_dir_status.stat.mode != '0755'
+
+    - name: Verify CSN values are gathered
+      assert:
+        that:
+          - "'csn_values' is defined"
+          - "csn_values | length > 0"
+        fail_msg: "CSN values were not gathered correctly"
+
+    - name: Verify replication-monitor role output contains expected CSN value
+      assert:
+        that: "'656965e2000000020000' in csn_values"
+        fail_msg: "Expected CSN value not found in role output"
+        success_msg: "Expected CSN value found in role output"

@@ -1,3 +1,13 @@
 ---
-- name: Converge
+- name: Converge - Setup Environment
   ansible.builtin.import_playbook: ../../playbooks/setup-environment.yml
+
+- name: Converge - Gather CSN
+  hosts: all
+  become: true
+  tasks:
+    - name: Run Replication-Monitor role
+      include_role:
+        name: ../../roles/Replication-Monitor
+      vars:
+        csn_task_file: gather_csn.yml

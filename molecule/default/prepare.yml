@@ -1,0 +1,14 @@
+- name: Prepare
+  hosts: all
+  become: true
+  tasks:
+    - name: Copy mock accesslog files to the test containers
+      ansible.builtin.copy:
+        src: "./files/mock_accesslog{{ item }}"
+        dest: "/tmp/accesslog{{ item }}"
+        mode: '0644'
+      loop:
+        - 1
+        - 2
+        - 3
+        - 4

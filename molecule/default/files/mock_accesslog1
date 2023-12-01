@@ -1,0 +1,183 @@
+	389-Directory/2.4.3 B2023.215.0000
+	localhost.localdomain:39001 (/etc/dirsrv/slapd-supplier1)
+
+[30/Nov/2023:23:48:12.660499306 -0500] conn=1 fd=64 slot=64 connection from local to /run/slapd-supplier1.socket
+[30/Nov/2023:23:48:12.898954491 -0500] conn=1 AUTOBIND dn="cn=Directory Manager"
+[30/Nov/2023:23:48:12.898961659 -0500] conn=1 op=0 BIND dn="cn=Directory Manager" method=sasl version=3 mech=EXTERNAL
+[30/Nov/2023:23:48:12.899015276 -0500] conn=1 op=0 RESULT err=0 tag=97 nentries=0 wtime=0.000062657 optime=0.000164422 etime=0.000226487 dn="cn=Directory Manager"
+[30/Nov/2023:23:48:12.908192172 -0500] conn=1 op=1 SRCH base="" scope=0 filter="(objectClass=*)" attrs="vendorVersion"
+[30/Nov/2023:23:48:12.908453912 -0500] conn=1 op=1 RESULT err=0 tag=101 nentries=1 wtime=0.000095267 optime=0.000265145 etime=0.000358840
+[30/Nov/2023:23:48:12.910669107 -0500] conn=1 op=2 UNBIND
+[30/Nov/2023:23:48:12.910679544 -0500] conn=1 op=2 fd=64 Disconnect - Cleanly Closed Connection - U1
+[30/Nov/2023:23:48:12.911770746 -0500] conn=2 fd=64 slot=64 connection from local to /run/slapd-supplier1.socket
+[30/Nov/2023:23:48:12.911926720 -0500] conn=2 AUTOBIND dn="cn=Directory Manager"
+[30/Nov/2023:23:48:12.911929913 -0500] conn=2 op=0 BIND dn="cn=Directory Manager" method=sasl version=3 mech=EXTERNAL
+[30/Nov/2023:23:48:12.911948199 -0500] conn=2 op=0 RESULT err=0 tag=97 nentries=0 wtime=0.000039683 optime=0.000079038 etime=0.000118264 dn="cn=Directory Manager"
+[30/Nov/2023:23:48:12.912554330 -0500] conn=2 op=1 SRCH base="" scope=0 filter="(objectClass=*)" attrs="vendorVersion"
+[30/Nov/2023:23:48:12.912768687 -0500] conn=2 op=1 RESULT err=0 tag=101 nentries=1 wtime=0.000078220 optime=0.000218561 etime=0.000295757
+[30/Nov/2023:23:48:12.913932744 -0500] conn=2 op=2 MOD dn="cn=config"
+[30/Nov/2023:23:48:12.919920085 -0500] conn=2 op=2 RESULT err=0 tag=103 nentries=0 wtime=0.000079000 optime=0.005994968 etime=0.006072699
+[30/Nov/2023:23:48:12.921117449 -0500] conn=2 op=3 ADD dn="cn=entryUUID,cn=default indexes,cn=config,cn=ldbm database,cn=plugins,cn=config"
+[30/Nov/2023:23:48:12.922879364 -0500] conn=2 op=3 RESULT err=0 tag=105 nentries=0 wtime=0.000095940 optime=0.001764997 etime=0.001859393
+[30/Nov/2023:23:48:12.923619896 -0500] conn=2 op=4 SRCH base="cn=mapping tree,cn=config" scope=2 filter="(&(&(objectClass=nsMappingTree))(|(cn=dc=example,dc=com)(nsslapd-backend=dc=example,dc=com)))" attrs="distinguishedName"
+[30/Nov/2023:23:48:12.923775681 -0500] conn=2 op=4 RESULT err=0 tag=101 nentries=0 wtime=0.000076685 optime=0.000158344 etime=0.000233668 - Invalid attribute in filter - results may not be complete.
+[30/Nov/2023:23:48:12.923964921 -0500] conn=2 op=5 SRCH base="cn=mapping tree,cn=config" scope=2 filter="(&(&(objectClass=nsMappingTree))(|(cn=userRoot)(nsslapd-backend=userRoot)))" attrs="distinguishedName"
+[30/Nov/2023:23:48:12.924019703 -0500] conn=2 op=5 RESULT err=0 tag=101 nentries=0 wtime=0.000072630 optime=0.000056583 etime=0.000128277 - Invalid attribute in filter - results may not be complete.
+[30/Nov/2023:23:48:12.924724839 -0500] conn=2 op=6 ADD dn="cn=userRoot,cn=ldbm database,cn=plugins,cn=config"
+[30/Nov/2023:23:48:12.949726131 -0500] conn=2 op=6 RESULT err=0 tag=105 nentries=0 wtime=0.000110007 optime=0.025003718 etime=0.025111865
+[30/Nov/2023:23:48:12.950323802 -0500] conn=2 op=7 ADD dn="cn=dc\3Dexample\2Cdc\3Dcom,cn=mapping tree,cn=config"
+[30/Nov/2023:23:48:12.961723291 -0500] conn=2 op=7 RESULT err=0 tag=105 nentries=0 wtime=0.000085073 optime=0.011402241 etime=0.011486104
+[30/Nov/2023:23:48:12.962162688 -0500] conn=2 op=8 SRCH base="cn=userRoot,cn=ldbm database,cn=plugins,cn=config" scope=0 filter="(objectClass=*)" attrs="nsslapd-suffix"
+[30/Nov/2023:23:48:12.962245478 -0500] conn=2 op=8 RESULT err=0 tag=101 nentries=1 wtime=0.000061314 optime=0.000085179 etime=0.000145686
+[30/Nov/2023:23:48:12.963031703 -0500] conn=2 op=9 ADD dn="dc=example,dc=com"
+[30/Nov/2023:23:48:12.992498980 -0500] conn=2 op=9 RESULT err=0 tag=105 nentries=0 wtime=0.000080460 optime=0.029469420 etime=0.029548220
+[30/Nov/2023:23:48:12.992916815 -0500] conn=2 op=10 MOD dn="dc=example,dc=com"
+[30/Nov/2023:23:48:13.004322787 -0500] conn=2 op=10 RESULT err=0 tag=103 nentries=0 wtime=0.000061817 optime=0.011410154 etime=0.011470233
+[30/Nov/2023:23:48:13.004486731 -0500] conn=2 op=11 ADD dn="cn=389_ds_system,dc=example,dc=com"
+[30/Nov/2023:23:48:13.031097878 -0500] conn=2 op=11 RESULT err=0 tag=105 nentries=0 wtime=0.000089334 optime=0.026612455 etime=0.026700284
+[30/Nov/2023:23:48:13.031947224 -0500] conn=2 op=12 ADD dn="ou=groups,dc=example,dc=com"
+[30/Nov/2023:23:48:13.035039091 -0500] conn=2 op=12 RESULT err=0 tag=105 nentries=0 wtime=0.000107646 optime=0.003094208 etime=0.003200096
+[30/Nov/2023:23:48:13.035201187 -0500] conn=2 op=13 ADD dn="ou=people,dc=example,dc=com"
+[30/Nov/2023:23:48:13.037822787 -0500] conn=2 op=13 RESULT err=0 tag=105 nentries=0 wtime=0.000175236 optime=0.002623039 etime=0.002796444
+[30/Nov/2023:23:48:13.038782421 -0500] conn=2 op=14 ADD dn="ou=permissions,dc=example,dc=com"
+[30/Nov/2023:23:48:13.041625306 -0500] conn=2 op=14 RESULT err=0 tag=105 nentries=0 wtime=0.000059762 optime=0.002845565 etime=0.002903588
+[30/Nov/2023:23:48:13.042420514 -0500] conn=2 op=15 ADD dn="ou=services,dc=example,dc=com"
+[30/Nov/2023:23:48:13.044165756 -0500] conn=2 op=15 RESULT err=0 tag=105 nentries=0 wtime=0.000084645 optime=0.001747880 etime=0.001830930
+[30/Nov/2023:23:48:13.044990868 -0500] conn=2 op=16 SRCH base="" scope=0 filter="(objectClass=*)" attrs="vendorVersion"
+[30/Nov/2023:23:48:13.045301486 -0500] conn=2 op=16 RESULT err=0 tag=101 nentries=1 wtime=0.000055931 optime=0.000326765 etime=0.000382277
+[30/Nov/2023:23:48:13.046302955 -0500] conn=2 op=17 ADD dn="uid=demo_user,ou=people,dc=example,dc=com"
+[30/Nov/2023:23:48:13.079170458 -0500] conn=2 op=17 RESULT err=0 tag=105 nentries=0 wtime=0.000075983 optime=0.032869717 etime=0.032943205
+[30/Nov/2023:23:48:13.080934922 -0500] conn=2 op=18 ADD dn="cn=demo_group,ou=Groups,dc=example,dc=com"
+[30/Nov/2023:23:48:13.085427109 -0500] conn=2 op=18 RESULT err=0 tag=105 nentries=0 wtime=0.000060543 optime=0.004495400 etime=0.004554190
+[30/Nov/2023:23:48:13.085660530 -0500] conn=2 op=19 ADD dn="cn=group_admin,ou=permissions,dc=example,dc=com"
+[30/Nov/2023:23:48:13.087749204 -0500] conn=2 op=19 RESULT err=0 tag=105 nentries=0 wtime=0.000044265 optime=0.002090807 etime=0.002133430
+[30/Nov/2023:23:48:13.088956156 -0500] conn=2 op=20 ADD dn="cn=group_modify,ou=permissions,dc=example,dc=com"
+[30/Nov/2023:23:48:13.092735570 -0500] conn=2 op=20 RESULT err=0 tag=105 nentries=0 wtime=0.000056165 optime=0.003781816 etime=0.003836229
+[30/Nov/2023:23:48:13.093907358 -0500] conn=2 op=21 ADD dn="cn=user_admin,ou=permissions,dc=example,dc=com"
+[30/Nov/2023:23:48:13.096144542 -0500] conn=2 op=21 RESULT err=0 tag=105 nentries=0 wtime=0.000078302 optime=0.002239339 etime=0.002316067
+[30/Nov/2023:23:48:13.097428967 -0500] conn=2 op=22 ADD dn="cn=user_modify,ou=permissions,dc=example,dc=com"
+[30/Nov/2023:23:48:13.099658672 -0500] conn=2 op=22 RESULT err=0 tag=105 nentries=0 wtime=0.000056664 optime=0.002231995 etime=0.002286787
+[30/Nov/2023:23:48:13.100992350 -0500] conn=2 op=23 ADD dn="cn=user_passwd_reset,ou=permissions,dc=example,dc=com"
+[30/Nov/2023:23:48:13.103986318 -0500] conn=2 op=23 RESULT err=0 tag=105 nentries=0 wtime=0.000049263 optime=0.002999819 etime=0.003047409
+[30/Nov/2023:23:48:13.105247934 -0500] conn=2 op=24 ADD dn="cn=user_private_read,ou=permissions,dc=example,dc=com"
+[30/Nov/2023:23:48:13.107957871 -0500] conn=2 op=24 RESULT err=0 tag=105 nentries=0 wtime=0.000057634 optime=0.002712218 etime=0.002768047
+[30/Nov/2023:23:48:13.108967929 -0500] conn=2 op=25 ADD dn="cn=rfc 2829 u syntax,cn=mapping,cn=sasl,cn=config"
+[30/Nov/2023:23:48:13.111685137 -0500] conn=2 op=26 ADD dn="cn=uid mapping,cn=mapping,cn=sasl,cn=config"
+[30/Nov/2023:23:48:13.112421918 -0500] conn=2 op=25 RESULT err=0 tag=105 nentries=0 wtime=0.000088923 optime=0.003456773 etime=0.003544190
+[30/Nov/2023:23:48:13.114029261 -0500] conn=2 op=27 MOD dn="cn=config"
+[30/Nov/2023:23:48:13.115414567 -0500] conn=2 op=26 RESULT err=0 tag=105 nentries=0 wtime=0.000065688 optime=0.003732360 etime=0.003797000
+[30/Nov/2023:23:48:13.128429062 -0500] conn=2 op=27 RESULT err=0 tag=103 nentries=0 wtime=0.000037074 optime=0.014401971 etime=0.014437026
+[30/Nov/2023:23:48:13.156436864 -0500] conn=2 op=-1 fd=64 Disconnect - Operation canceled - Connection aborted - A1
+[30/Nov/2023:23:48:16.783751421 -0500] conn=1 fd=64 slot=64 connection from 127.0.0.1 to 127.0.0.1
+[30/Nov/2023:23:48:16.986636481 -0500] conn=1 op=0 BIND dn="cn=Directory Manager" method=128 version=3
+[30/Nov/2023:23:48:16.995698813 -0500] conn=1 op=0 RESULT err=0 tag=97 nentries=0 wtime=0.000063082 optime=0.009098896 etime=0.009159991 dn="cn=directory manager"
+[30/Nov/2023:23:48:16.996392676 -0500] conn=1 op=1 SRCH base="" scope=0 filter="(objectClass=*)" attrs="vendorVersion"
+[30/Nov/2023:23:48:16.997256516 -0500] conn=1 op=1 RESULT err=0 tag=101 nentries=1 wtime=0.000082570 optime=0.000866095 etime=0.000946946
+[30/Nov/2023:23:48:16.997467678 -0500] conn=1 op=2 MOD dn="cn=config"
+[30/Nov/2023:23:48:17.001148137 -0500] conn=1 op=3 MOD dn="cn=config"
+[30/Nov/2023:23:48:17.001188653 -0500] conn=1 op=2 RESULT err=0 tag=103 nentries=0 wtime=0.000071689 optime=0.003727004 etime=0.003797610
+[30/Nov/2023:23:48:17.010618195 -0500] conn=1 op=4 MOD dn="cn=config"
+[30/Nov/2023:23:48:17.010632411 -0500] conn=1 op=3 RESULT err=0 tag=103 nentries=0 wtime=0.000054039 optime=0.009489450 etime=0.009542585
+[30/Nov/2023:23:48:17.019560336 -0500] conn=1 op=5 MOD dn="cn=config"
+[30/Nov/2023:23:48:17.022676675 -0500] conn=1 (Internal) op=5(1)(1) SRCH base="cn=config" scope=0 filter="(|(objectclass=*)(objectclass=ldapsubentry))" attrs=ALL
+[30/Nov/2023:23:48:17.019597992 -0500] conn=1 op=4 RESULT err=0 tag=103 nentries=0 wtime=0.000051644 optime=0.008983145 etime=0.009033773
+[30/Nov/2023:23:48:17.027862961 -0500] conn=1 (Internal) op=5(1)(1) RESULT err=0 tag=48 nentries=1 wtime=0.000015298 optime=0.005188374 etime=0.005202583
+[30/Nov/2023:23:48:17.031549576 -0500] conn=1 op=6 MOD dn="cn=config"
+[30/Nov/2023:23:48:17.034218541 -0500] conn=1 (Internal) op=6(1)(1) SRCH base="cn=config" scope=0 filter="(|(objectclass=*)(objectclass=ldapsubentry))" attrs=ALL
+[30/Nov/2023:23:48:17.031588819 -0500] conn=1 op=5 RESULT err=0 tag=103 nentries=0 wtime=0.000051535 optime=0.012031181 etime=0.012081591
+[30/Nov/2023:23:48:17.037599958 -0500] conn=1 (Internal) op=6(1)(1) RESULT err=0 tag=48 nentries=1 wtime=0.000013815 optime=0.003383573 etime=0.003396251
+[30/Nov/2023:23:48:17.043784303 -0500] conn=1 op=7 MOD dn="cn=config"
+[30/Nov/2023:23:48:17.046130149 -0500] conn=1 (Internal) op=7(1)(1) SRCH base="cn=config" scope=0 filter="(|(objectclass=*)(objectclass=ldapsubentry))" attrs=ALL
+[30/Nov/2023:23:48:17.049382035 -0500] conn=1 (Internal) op=7(1)(1) RESULT err=0 tag=48 nentries=1 wtime=0.000016504 optime=0.003253757 etime=0.003269347
+[30/Nov/2023:23:48:17.043879905 -0500] conn=1 op=6 RESULT err=0 tag=103 nentries=0 wtime=0.000052143 optime=0.012333320 etime=0.012384121
+[30/Nov/2023:23:48:17.053142952 -0500] conn=1 op=7 RESULT err=0 tag=103 nentries=0 wtime=0.000047782 optime=0.009361822 etime=0.009408112
+[30/Nov/2023:23:48:19.736893609 -0500] conn=Internal(0) op=0(1)(1) SRCH base="dc=example,dc=com" scope=2 filter="(&(objectclass=ldapsubentry)(|(objectclass=nsRoleDefinition)(objectclass=cosSuperDefinition)))" attrs=ALL
+[30/Nov/2023:23:48:19.781043555 -0500] conn=Internal(0) op=0(1)(1) RESULT err=0 tag=48 nentries=0 wtime=0.000065603 optime=0.044152162 etime=0.044215873
+[30/Nov/2023:23:48:49.147263117 -0500] conn=1 op=8 SRCH base="cn=mapping tree,cn=config" scope=2 filter="(&(&(objectClass=nsds5Replica))(|(nsDS5ReplicaRoot=dc=example,dc=com)))" attrs="distinguishedName"
+[30/Nov/2023:23:48:49.153867892 -0500] conn=1 op=8 RESULT err=0 tag=101 nentries=0 wtime=0.000112924 optime=0.006607458 etime=0.006718335
+[30/Nov/2023:23:48:49.157571219 -0500] conn=1 op=9 SRCH base="cn=replication_managers,dc=example,dc=com" scope=0 filter="(objectClass=*)" attrs=ALL
+[30/Nov/2023:23:48:49.159464466 -0500] conn=1 op=9 RESULT err=32 tag=101 nentries=0 wtime=0.000035134 optime=0.001893849 etime=0.001927456
+[30/Nov/2023:23:48:49.162229544 -0500] conn=1 op=10 ADD dn="cn=replication_managers,dc=example,dc=com"
+[30/Nov/2023:23:48:49.178078693 -0500] conn=1 op=10 RESULT err=0 tag=105 nentries=0 wtime=0.000047282 optime=0.015852450 etime=0.015898134
+[30/Nov/2023:23:48:49.185219348 -0500] conn=1 op=11 SRCH base="ou=Services,dc=example,dc=com" scope=0 filter="(objectClass=*)" attrs=ALL
+[30/Nov/2023:23:48:49.188263587 -0500] conn=1 op=11 RESULT err=0 tag=101 nentries=1 wtime=0.000023502 optime=0.003044543 etime=0.003066679
+[30/Nov/2023:23:48:49.190865574 -0500] conn=1 op=12 MOD dn="ou=Services,dc=example,dc=com"
+[30/Nov/2023:23:48:49.192916767 -0500] conn=1 (Internal) op=12(1)(1) SRCH base="ou=Services,dc=example,dc=com" scope=0 filter="(|(objectclass=*)(objectclass=ldapsubentry))" attrs=ALL
+[30/Nov/2023:23:48:49.194829800 -0500] conn=1 (Internal) op=12(1)(1) RESULT err=0 tag=48 nentries=1 wtime=0.000015438 optime=0.001913842 etime=0.001927778
+[30/Nov/2023:23:48:49.201433735 -0500] conn=1 op=12 RESULT err=0 tag=103 nentries=0 wtime=0.000015866 optime=0.010569671 etime=0.010583885
+[30/Nov/2023:23:48:49.209273227 -0500] conn=1 op=13 SRCH base="cn=vm-10-0-186-27.hosted.upshift.rdu2.redhat.com:63701,ou=Services,dc=example,dc=com" scope=0 filter="(objectClass=*)" attrs=ALL
+[30/Nov/2023:23:48:49.211207287 -0500] conn=1 op=13 RESULT err=32 tag=101 nentries=0 wtime=0.000022444 optime=0.001934220 etime=0.001955401
+[30/Nov/2023:23:48:49.213060268 -0500] conn=1 op=14 ADD dn="cn=vm-10-0-186-27.hosted.upshift.rdu2.redhat.com:63701,ou=Services,dc=example,dc=com"
+[30/Nov/2023:23:48:49.229317400 -0500] conn=1 op=14 RESULT err=0 tag=105 nentries=0 wtime=0.000037463 optime=0.016260203 etime=0.016295773
+[30/Nov/2023:23:48:49.233330229 -0500] conn=1 op=15 SRCH base="cn=replication_managers,dc=example,dc=com" scope=0 filter="(objectClass=*)" attrs="member"
+[30/Nov/2023:23:48:49.235298364 -0500] conn=1 op=15 RESULT err=0 tag=101 nentries=1 wtime=0.000020518 optime=0.001968517 etime=0.001987643
+[30/Nov/2023:23:48:49.237930058 -0500] conn=1 op=16 SRCH base="cn=replication_managers,dc=example,dc=com" scope=0 filter="(objectClass=*)" attrs="member"
+[30/Nov/2023:23:48:49.239837353 -0500] conn=1 op=16 RESULT err=0 tag=101 nentries=1 wtime=0.000019260 optime=0.001908226 etime=0.001926001
+[30/Nov/2023:23:48:49.244271256 -0500] conn=1 op=17 MOD dn="cn=replication_managers,dc=example,dc=com"
+[30/Nov/2023:23:48:49.246113860 -0500] conn=1 (Internal) op=17(1)(1) SRCH base="cn=replication_managers,dc=example,dc=com" scope=0 filter="(|(objectclass=*)(objectclass=ldapsubentry))" attrs=ALL
+[30/Nov/2023:23:48:49.247896511 -0500] conn=1 (Internal) op=17(1)(1) RESULT err=0 tag=48 nentries=1 wtime=0.000010657 optime=0.001783432 etime=0.001792528
+[30/Nov/2023:23:48:49.258171744 -0500] conn=1 op=17 RESULT err=0 tag=103 nentries=0 wtime=0.000019517 optime=0.013902081 etime=0.013919995
+[30/Nov/2023:23:48:49.262906780 -0500] conn=1 op=18 SRCH base="cn=mapping tree,cn=config" scope=2 filter="(&(&(objectClass=nsMappingTree))(|(cn=dc=example,dc=com)(nsslapd-backend=dc=example,dc=com)))" attrs="distinguishedName"
+[30/Nov/2023:23:48:49.265161080 -0500] conn=1 op=18 RESULT err=0 tag=101 nentries=1 wtime=0.000029463 optime=0.002253574 etime=0.002281657 - Invalid attribute in filter - results may not be complete.
+[30/Nov/2023:23:48:49.267170798 -0500] conn=1 op=19 ADD dn="cn=replica,cn=dc\3Dexample\2Cdc\3Dcom,cn=mapping tree,cn=config"
+[30/Nov/2023:23:48:49.271665225 -0500] conn=1 (Internal) op=19(1)(1) SRCH base="cn=replication_managers,dc=example,dc=com" scope=0 filter="(|(objectclass=groupOfNames)(objectclass=groupOfUniqueNames)(objectclass=groupOfURLs))" attrs="member uniquemember memberURL"
+[30/Nov/2023:23:48:49.273634434 -0500] conn=1 (Internal) op=19(1)(1) RESULT err=0 tag=48 nentries=1 wtime=0.000016724 optime=0.001970219 etime=0.001985451
+[30/Nov/2023:23:48:49.275467457 -0500] conn=1 (Internal) op=19(2)(1) SRCH base="cn=vm-10-0-186-27.hosted.upshift.rdu2.redhat.com:63701,ou=services,dc=example,dc=com" scope=0 filter="(|(objectclass=groupOfNames)(objectclass=groupOfUniqueNames)(objectclass=groupOfURLs))" attrs="member uniquemember memberURL"
+[30/Nov/2023:23:48:49.277308583 -0500] conn=1 (Internal) op=19(2)(1) RESULT err=0 tag=48 nentries=0 wtime=0.000007739 optime=0.001841846 etime=0.001848370
+[30/Nov/2023:23:48:49.279158215 -0500] conn=1 (Internal) op=19(3)(1) SRCH base="dc=example,dc=com" scope=0 filter="objectclass=*" attrs="nsds50ruv"
+[30/Nov/2023:23:48:49.281129749 -0500] conn=1 (Internal) op=19(3)(1) RESULT err=32 tag=48 nentries=0 wtime=0.000006595 optime=0.001972218 etime=0.001977429
+[30/Nov/2023:23:48:49.282999479 -0500] conn=1 (Internal) op=19(4)(1) ADD dn="dc=example,dc=com"
+[30/Nov/2023:23:48:49.302630756 -0500] conn=1 (Internal) op=19(4)(1) RESULT err=0 tag=48 nentries=0 wtime=0.000005168 optime=0.019633322 etime=0.019636946
+[30/Nov/2023:23:48:49.310512097 -0500] conn=1 (Internal) op=19(5)(1) ADD dn="cn=changelog,cn=userRoot,cn=ldbm database,cn=plugins,cn=config"
+[30/Nov/2023:23:48:49.315570941 -0500] conn=1 (Internal) op=19(5)(1) RESULT err=0 tag=48 nentries=0 wtime=0.000013856 optime=0.005063287 etime=0.005076124
+[30/Nov/2023:23:48:49.336969703 -0500] conn=1 (Internal) op=19(6)(1) SRCH base="cn=changelog,cn=userRoot,cn=ldbm database,cn=plugins,cn=config" scope=0 filter="objectclass=*" attrs=ALL
+[30/Nov/2023:23:48:49.339150116 -0500] conn=1 (Internal) op=19(6)(1) RESULT err=0 tag=48 nentries=1 wtime=0.000012277 optime=0.002181307 etime=0.002192345
+[30/Nov/2023:23:48:49.344549462 -0500] conn=1 (Internal) op=19(7)(1) SRCH base="cn=dc\3Dexample\2Cdc\3Dcom,cn=mapping tree,cn=config" scope=0 filter="objectclass=*" attrs="nsslapd-backend nsslapd-distribution-plugin nsslapd-distribution-funct"
+[30/Nov/2023:23:48:49.346463514 -0500] conn=1 (Internal) op=19(7)(1) RESULT err=0 tag=48 nentries=1 wtime=0.000011984 optime=0.001915258 etime=0.001926001
+[30/Nov/2023:23:48:49.349718902 -0500] conn=1 (Internal) op=19(8)(1) SRCH base="cn=dc\3Dexample\2Cdc\3Dcom,cn=mapping tree,cn=config" scope=0 filter="objectclass=nsMappingTree" attrs="nsslapd-state"
+[30/Nov/2023:23:48:49.351441160 -0500] conn=1 (Internal) op=19(8)(1) RESULT err=0 tag=48 nentries=1 wtime=0.000005251 optime=0.001722940 etime=0.001727184
+[30/Nov/2023:23:48:49.353712355 -0500] conn=1 (Internal) op=19(9)(1) MOD dn="cn=dc\3Dexample\2Cdc\3Dcom,cn=mapping tree,cn=config"
+[30/Nov/2023:23:48:49.355584166 -0500] conn=1 (Internal) op=19(9)(1) RESULT err=16 tag=48 nentries=0 wtime=0.000004158 optime=0.001872061 etime=0.001875088
+[30/Nov/2023:23:48:49.364814107 -0500] conn=1 op=19 RESULT err=0 tag=105 nentries=0 wtime=0.000047680 optime=0.097646221 etime=0.097692764
+[30/Nov/2023:23:48:49.369732149 -0500] conn=1 op=20 SRCH base="cn=ldbm database,cn=plugins,cn=config" scope=2 filter="(&(objectClass=nsBackendInstance))" attrs="distinguishedName"
+[30/Nov/2023:23:48:49.371897170 -0500] conn=1 op=20 RESULT err=0 tag=101 nentries=1 wtime=0.000025310 optime=0.002165679 etime=0.002189955
+[30/Nov/2023:23:48:49.374478036 -0500] conn=1 op=21 SRCH base="cn=userRoot,cn=ldbm database,cn=plugins,cn=config" scope=0 filter="(objectClass=*)" attrs="nsslapd-suffix"
+[30/Nov/2023:23:48:49.376974826 -0500] conn=1 op=21 RESULT err=0 tag=101 nentries=1 wtime=0.000019734 optime=0.002497891 etime=0.002516188
+[30/Nov/2023:23:48:49.387298699 -0500] conn=1 op=22 MOD dn="cn=changelog,cn=userRoot,cn=ldbm database,cn=plugins,cn=config"
+[30/Nov/2023:23:48:49.389642924 -0500] conn=1 (Internal) op=22(1)(1) SRCH base="cn=changelog,cn=userRoot,cn=ldbm database,cn=plugins,cn=config" scope=0 filter="(|(objectclass=*)(objectclass=ldapsubentry))" attrs=ALL
+[30/Nov/2023:23:48:49.391569253 -0500] conn=1 (Internal) op=22(1)(1) RESULT err=0 tag=48 nentries=1 wtime=0.000008992 optime=0.001926968 etime=0.001934783
+[30/Nov/2023:23:48:49.395542288 -0500] conn=1 op=22 RESULT err=0 tag=103 nentries=0 wtime=0.000016434 optime=0.008245426 etime=0.008260324
+[30/Nov/2023:23:48:49.400893699 -0500] conn=1 op=23 SRCH base="cn=mapping tree,cn=config" scope=2 filter="(&(&(objectClass=nsds5Replica))(|(nsDS5ReplicaRoot=dc=example,dc=com)))" attrs="distinguishedName"
+[30/Nov/2023:23:48:49.402690452 -0500] conn=1 op=23 RESULT err=0 tag=101 nentries=1 wtime=0.000025693 optime=0.001797075 etime=0.001821633
+[30/Nov/2023:23:48:49.405042390 -0500] conn=1 op=24 SRCH base="cn=replica,cn=dc\3Dexample\2Cdc\3Dcom,cn=mapping tree,cn=config" scope=0 filter="(objectClass=*)" attrs="nsDS5ReplicaRoot"
+[30/Nov/2023:23:48:49.406980343 -0500] conn=1 op=24 RESULT err=0 tag=101 nentries=1 wtime=0.000018729 optime=0.001938750 etime=0.001956357
+[30/Nov/2023:23:48:49.409230060 -0500] conn=1 op=25 SRCH base="cn=mapping tree,cn=config" scope=2 filter="(&(&(objectClass=nsds5Replica))(|(nsDS5ReplicaRoot=dc=example,dc=com)))" attrs="distinguishedName"
+[30/Nov/2023:23:48:49.411078073 -0500] conn=1 op=25 RESULT err=0 tag=101 nentries=1 wtime=0.000026700 optime=0.001848911 etime=0.001874418
+[30/Nov/2023:23:48:49.413235833 -0500] conn=1 op=26 SRCH base="cn=replica,cn=dc\3Dexample\2Cdc\3Dcom,cn=mapping tree,cn=config" scope=0 filter="(objectClass=*)" attrs="nsDS5ReplicaRoot"
+[30/Nov/2023:23:48:49.415625778 -0500] conn=1 op=26 RESULT err=0 tag=101 nentries=1 wtime=0.000019173 optime=0.002390680 etime=0.002408657
+[30/Nov/2023:23:48:49.417562661 -0500] conn=1 op=27 SRCH base="cn=replica,cn=dc\3Dexample\2Cdc\3Dcom,cn=mapping tree,cn=config" scope=0 filter="(objectClass=*)" attrs="nsDS5ReplicaType"
+[30/Nov/2023:23:48:49.420035421 -0500] conn=1 op=27 RESULT err=0 tag=101 nentries=1 wtime=0.000018884 optime=0.002473421 etime=0.002490566
+[30/Nov/2023:23:48:49.421961295 -0500] conn=1 op=28 SRCH base="cn=replication_managers,dc=example,dc=com" scope=0 filter="(objectClass=*)" attrs=ALL
+[30/Nov/2023:23:48:49.423761115 -0500] conn=1 op=28 RESULT err=0 tag=101 nentries=1 wtime=0.000018693 optime=0.001800710 etime=0.001818136
+[30/Nov/2023:23:48:49.425561148 -0500] conn=1 op=29 MOD dn="cn=replication_managers,dc=example,dc=com"
+[30/Nov/2023:23:48:49.427275923 -0500] conn=1 (Internal) op=29(1)(1) SRCH base="cn=replication_managers,dc=example,dc=com" scope=0 filter="(|(objectclass=*)(objectclass=ldapsubentry))" attrs=ALL
+[30/Nov/2023:23:48:49.429039551 -0500] conn=1 (Internal) op=29(1)(1) RESULT err=0 tag=48 nentries=1 wtime=0.000008755 optime=0.001764313 etime=0.001771486
+[30/Nov/2023:23:48:49.449293898 -0500] conn=1 op=29 RESULT err=0 tag=103 nentries=0 wtime=0.000016356 optime=0.023734024 etime=0.023748714 csn=656965b1000100010000
+[30/Nov/2023:23:48:49.453132003 -0500] conn=1 op=30 SRCH base="ou=Services,dc=example,dc=com" scope=0 filter="(objectClass=*)" attrs=ALL
+[30/Nov/2023:23:48:49.454909654 -0500] conn=1 op=30 RESULT err=0 tag=101 nentries=1 wtime=0.000017727 optime=0.001777746 etime=0.001793970
+[30/Nov/2023:23:48:49.456891931 -0500] conn=1 op=31 MOD dn="ou=Services,dc=example,dc=com"
+[30/Nov/2023:23:48:49.458758161 -0500] conn=1 (Internal) op=31(1)(1) SRCH base="ou=Services,dc=example,dc=com" scope=0 filter="(|(objectclass=*)(objectclass=ldapsubentry))" attrs=ALL
+[30/Nov/2023:23:48:49.460575952 -0500] conn=1 (Internal) op=31(1)(1) RESULT err=0 tag=48 nentries=1 wtime=0.000009641 optime=0.001818771 etime=0.001827025
+[30/Nov/2023:23:48:49.482285752 -0500] conn=1 op=31 RESULT err=0 tag=103 nentries=0 wtime=0.000016171 optime=0.025394404 etime=0.025408584 csn=656965b1000200010000
+[30/Nov/2023:23:48:49.486709695 -0500] conn=1 op=32 SRCH base="cn=vm-10-0-186-27.hosted.upshift.rdu2.redhat.com:63702,ou=Services,dc=example,dc=com" scope=0 filter="(objectClass=*)" attrs=ALL
+[30/Nov/2023:23:48:49.490205348 -0500] conn=1 op=32 RESULT err=32 tag=101 nentries=0 wtime=0.000024688 optime=0.003495824 etime=0.003519025
+[30/Nov/2023:23:48:49.492457442 -0500] conn=1 op=33 ADD dn="cn=vm-10-0-186-27.hosted.upshift.rdu2.redhat.com:63702,ou=Services,dc=example,dc=com"
+[30/Nov/2023:23:48:49.519996122 -0500] conn=1 op=33 RESULT err=0 tag=105 nentries=0 wtime=0.000038132 optime=0.027541634 etime=0.027578210 csn=656965b1000300010000
+[30/Nov/2023:23:48:49.523644355 -0500] conn=1 op=34 SRCH base="cn=replication_managers,dc=example,dc=com" scope=0 filter="(objectClass=*)" attrs="member"
+[30/Nov/2023:23:48:49.525456549 -0500] conn=1 op=34 RESULT err=0 tag=101 nentries=1 wtime=0.000019731 optime=0.001812735 etime=0.001830997
+[30/Nov/2023:23:48:49.527585745 -0500] conn=1 op=35 SRCH base="cn=replication_managers,dc=example,dc=com" scope=0 filter="(objectClass=*)" attrs="member"
+[30/Nov/2023:23:48:49.529434009 -0500] conn=1 op=35 RESULT err=0 tag=101 nentries=1 wtime=0.000018996 optime=0.001849036 etime=0.001866560
+[30/Nov/2023:23:48:49.531448972 -0500] conn=1 op=36 MOD dn="cn=replication_managers,dc=example,dc=com"
+[30/Nov/2023:23:48:49.533676316 -0500] conn=1 (Internal) op=36(1)(1) SRCH base="cn=replication_managers,dc=example,dc=com" scope=0 filter="(|(objectclass=*)(objectclass=ldapsubentry))" attrs=ALL
+[30/Nov/2023:23:48:49.535610020 -0500] conn=1 (Internal) op=36(1)(1) RESULT err=0 tag=48 nentries=1 wtime=0.000009926 optime=0.001934556 etime=0.001943037
+[30/Nov/2023:23:48:49.553930465 -0500] conn=1 op=36 RESULT err=0 tag=103 nentries=0 wtime=0.000018266 optime=0.022483031 etime=0.022499718 csn=656965b1000400010000
