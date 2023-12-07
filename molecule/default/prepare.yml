@@ -2,13 +2,14 @@
   hosts: all
   become: true
   tasks:
-    - name: Copy mock accesslog files to the test containers
+    - name: Copy mock accesslog files to the respective test containers
       ansible.builtin.copy:
-        src: "./files/mock_accesslog{{ item }}"
-        dest: "/tmp/accesslog{{ item }}"
+        src: "./files/mock_accesslog{{ item.file }}"
+        dest: "/tmp/accesslog{{ item.file }}"
         mode: '0644'
       loop:
-        - 1
-        - 2
-        - 3
-        - 4
+        - { file: 1, host: 'instance1' }
+        - { file: 2, host: 'instance2' }
+        - { file: 3, host: 'instance3' }
+        - { file: 4, host: 'instance4' }
+      when: inventory_hostname == item.host

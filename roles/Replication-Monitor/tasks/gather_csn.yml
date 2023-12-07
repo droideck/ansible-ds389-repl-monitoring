@@ -6,18 +6,22 @@
 
 - name: Copy dslogs script to the target machine
   ansible.builtin.copy:
-    src: "./dslogs"
-    dest: "/tmp/dslogs"
+    src: "./files/dslogs.py"
+    dest: "/tmp/dslogs.py"
     mode: "0755"
 
-- name: Parse CSN values from log files using dslogs script
-  ansible.builtin.command: "python3 /tmp/dslogs {{ log_files.files | map(attribute='path') | join(' ') }}"
-  register: csn_values
+- name: Execute dslogs script and redirect output to file
+  ansible.builtin.shell: "python3 /tmp/dslogs.py {{ log_files.files | map(attribute='path') | join(' ') }} > /tmp/{{ inventory_hostname }}_dslogs_output.json"
+  args:
+    executable: /bin/bash
 
-- name: Parse CSN value
-  set_fact:
-    csn_values: "{{ csn_values.stdout }}"
+- name: Copy dslogs output file to controller with server name in filename
+  ansible.builtin.fetch:
+    src: "/tmp/{{ inventory_hostname }}_dslogs_output.json"
+    dest: "/tmp/{{ inventory_hostname }}_dslogs_output.json"
+    flat: yes
 
-- name: Debug CSN values
-  ansible.builtin.debug:
-    var: csn_values
+- name: Run merge_dslogs script on the controller
+  ansible.builtin.command: "python3 ./files/merge_dslogs.py {{ log_files.files | map(attribute='path') | join(' ') }}"
+  delegate_to: localhost
+  run_once: true
