@@ -4,12 +4,6 @@
   tasks:
     - name: Copy mock accesslog files to the respective test containers
       ansible.builtin.copy:
-        src: "./files/mock_accesslog{{ item.file }}"
-        dest: "/tmp/accesslog{{ item.file }}"
+        src: "./files/mock_accesslog{{ hostvars[inventory_hostname].ansible_hostname | regex_replace('^instance', '') }}"
+        dest: "/tmp/accesslog"
         mode: '0644'
-      loop:
-        - { file: 1, host: 'instance1' }
-        - { file: 2, host: 'instance2' }
-        - { file: 3, host: 'instance3' }
-        - { file: 4, host: 'instance4' }
-      when: inventory_hostname == item.host

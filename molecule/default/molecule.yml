@@ -43,7 +43,7 @@ provisioner:
   inventory:
     group_vars:
       all:
-        replication_monitoring_log_dir: '/var/log/ds389-replication-monitor'
+        replication_monitoring_log_dir: '/tmp'
         replication_monitoring_lag_threshold: 120
 
 

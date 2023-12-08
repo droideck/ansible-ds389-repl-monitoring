@@ -1,6 +1,6 @@
-- name: Find all log files in the directory
+- name: Find all log files in the replication monitoring directory
   ansible.builtin.find:
-    paths: "/tmp"
+    paths: "{{ replication_monitoring_log_dir }}"
     patterns: "access*"
   register: log_files
 
@@ -11,7 +11,7 @@
     mode: "0755"
 
 - name: Execute dslogs script and redirect output to file
-  ansible.builtin.shell: "python3 /tmp/dslogs.py {{ log_files.files | map(attribute='path') | join(' ') }} > /tmp/{{ inventory_hostname }}_dslogs_output.json"
+  ansible.builtin.shell: "python3 /tmp/dslogs.py {{ log_files.files | selectattr('path', 'match', '^/tmp/accesslog' + inventory_hostname | regex_replace('^instance', '') + '$') | map(attribute='path') | join(' ') }} > /tmp/{{ inventory_hostname }}_dslogs_output.json"
   args:
     executable: /bin/bash
 
@@ -22,6 +22,7 @@
     flat: yes
 
 - name: Run merge_dslogs script on the controller
-  ansible.builtin.command: "python3 ./files/merge_dslogs.py {{ log_files.files | map(attribute='path') | join(' ') }}"
+  ansible.builtin.command: "python3 ./files/merge_dslogs.py {{ groups['all'] | map('extract', hostvars, ['ansible_hostname']) | map('regex_replace', '^', '/tmp/') | map('regex_replace', '$', '_dslogs_output.json') | join(' ') }}"
   delegate_to: localhost
   run_once: true
+
