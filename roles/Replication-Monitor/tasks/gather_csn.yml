@@ -6,14 +6,20 @@
 
 - name: Copy dslogs script to the target machine
   ansible.builtin.copy:
-    src: "./files/dslogs.py"
+    src: "{{ role_path }}/scripts/dslogs.py"
     dest: "/tmp/dslogs.py"
     mode: "0755"
 
-- name: Execute dslogs script and redirect output to file
-  ansible.builtin.shell: "python3 /tmp/dslogs.py {{ log_files.files | selectattr('path', 'match', '^/tmp/accesslog' + inventory_hostname | regex_replace('^instance', '') + '$') | map(attribute='path') | join(' ') }} > /tmp/{{ inventory_hostname }}_dslogs_output.json"
-  args:
-    executable: /bin/bash
+- name: Execute dslogs script with output file option
+  ansible.builtin.command:
+    cmd: >
+      python3 /tmp/dslogs.py
+      {% for file in log_files.files %}
+      {% if file.path.startswith(replication_monitoring_log_dir + 'access') %}
+      {{ file.path }}
+      {% endif %}
+      {% endfor %}
+      -o /tmp/{{ inventory_hostname }}_dslogs_output.json
 
 - name: Copy dslogs output file to controller with server name in filename
   ansible.builtin.fetch:
@@ -22,7 +28,11 @@
     flat: yes
 
 - name: Run merge_dslogs script on the controller
-  ansible.builtin.command: "python3 ./files/merge_dslogs.py {{ groups['all'] | map('extract', hostvars, ['ansible_hostname']) | map('regex_replace', '^', '/tmp/') | map('regex_replace', '$', '_dslogs_output.json') | join(' ') }}"
+  ansible.builtin.command:
+    cmd: >
+      python3 {{ role_path }}/scripts/merge_dslogs.py -o /tmp/merged_output.json
+      {% for host in groups['all'] %}
+      /tmp/{{ hostvars[host]['inventory_hostname'] }}_dslogs_output.json
+      {% endfor %}
   delegate_to: localhost
   run_once: true
-

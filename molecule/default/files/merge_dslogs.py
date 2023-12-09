@@ -1,5 +1,6 @@
 import json
 import sys
+import argparse
 from datetime import datetime
 
 
@@ -46,19 +47,24 @@ def process_file(file_path):
     return split_json(input_json)
 
 
-def main():
+def main(args):
     json_processed_list = []
-    for file_path in sys.argv[1:]:
+    for file_path in args.files:
         splitted_jsons = process_file(file_path)
         for json_obj in splitted_jsons:
             json_processed_list.append(json_obj)
     merged_result = merge_jsons(json_processed_list)
 
-    # Output the merged JSON to a file or print it
-    with open('merged_result.json', 'w') as outfile:
-        json.dump(merged_result, outfile, indent=4)
-
+    # Output handling based on -o argument
+    if args.output:
+        with open(args.output, 'w') as outfile:
+            json.dump(merged_result, outfile, indent=4)
+    else:
+        print(json.dumps(merged_result, indent=4))
 
 if __name__ == "__main__":
-    main()
-
+    parser = argparse.ArgumentParser(description="Merge JSON logs")
+    parser.add_argument('files', nargs='+', help="Paths to input JSON files")
+    parser.add_argument('-o', '--output', help="Path to output file. If not provided, output is printed to stdout.")
+    args = parser.parse_args()
+    main(args)
