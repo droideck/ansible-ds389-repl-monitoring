@@ -12,10 +12,7 @@
         name: "{{ item }}"
         state: present
       loop:
-        - rsync             # For file synchronization
-        - openldap-clients  # For LDAP operations - ? - or will we use python scripts?
-        - curl              # For making HTTP requests, if needed for notifications.
-        - jq                # For processing JSON data.
+        - python-matplotlib
       when: ansible_os_family == "RedHat"
 
     - name: Ensure log directory exists

@@ -1,5 +1,0 @@
----
-- name: Merge dslogs outputs from all servers
-  command: "python3 ./merge_dslogs.py {{ log_files_path | join(' ') }}"
-  vars:
-    log_files_path: "{{ groups['all'] | map('regex_replace', inventory_hostname+'.json', '/tmp/'+inventory_hostname+'_dslogs_output.json') | list }}"
