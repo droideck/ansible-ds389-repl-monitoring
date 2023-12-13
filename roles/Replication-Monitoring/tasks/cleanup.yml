@@ -1,0 +1,17 @@
+---
+- name: Remove temporary dslogs script from the target machine
+  ansible.builtin.file:
+    path: "/tmp/dslogs.py"
+    state: absent
+
+- name: Remove temporary dslogs output files from the target machine
+  ansible.builtin.file:
+    path: "/tmp/{{ inventory_hostname }}_dslogs_output.json"
+    state: absent
+
+- name: Remove merged_output.json from the controller
+  ansible.builtin.file:
+    path: "/tmp/merged_output.json"
+    state: absent
+  delegate_to: localhost
+  run_once: true

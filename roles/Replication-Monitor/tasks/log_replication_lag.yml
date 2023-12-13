@@ -1,9 +1,0 @@
-- name: Execute dslogsplots script on the controller to process merged logs and generate plots
-  ansible.builtin.command:
-    cmd: >
-      python3 {{ role_path }}/scripts/dslogsplots.py
-      -i /tmp/merged_output.json
-      -c /tmp/replication_lag.csv
-      -o /tmp/replication_lag.png
-  delegate_to: localhost
-  run_once: true

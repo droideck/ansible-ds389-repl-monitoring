@@ -15,7 +15,8 @@
     cmd: >
       python3 /tmp/dslogs.py
       {% for file in log_files.files %}
-      {% if file.path.startswith(replication_monitoring_log_dir + 'access') %}
+      {% set normalized_dir = replication_monitoring_log_dir | regex_replace('/$', '') %}
+      {% if file.path.startswith(normalized_dir + '/access') %}
       {{ file.path }}
       {% endif %}
       {% endfor %}

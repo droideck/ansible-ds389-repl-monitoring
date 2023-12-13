@@ -116,6 +116,11 @@ class LagInfo:
 
         plt.plot(xdata, ydata, label='lag')
         plt.plot(xdata, edata, label='etime')
+
+        # Draw replication monitoring threshold line
+        if self.args.replication_monitoring_threshold is not None:
+            plt.axhline(y=self.args.replication_monitoring_threshold, color='r', linestyle='-', label='Replication Monitoring Threshold')
+
         plt.title('Replication lag time')
         plt.ylabel('time (s)')
         plt.xlabel(f'log time (starting on {starting_time})')
@@ -140,6 +145,7 @@ def parse_arguments():
     parser.add_argument('-e', '--etime', type=float, help="Show only changes with etime >= value")
     parser.add_argument('-x', '--index', action="append", type=int, help="Ignore log files whose indexes are not specified")
     parser.add_argument('-u', '--utc-offset', type=int, help="UTC offset in seconds for timezone adjustment")
+    parser.add_argument('-t', '--replication-monitoring-threshold', type=float, help="Replication monitoring threshold value")
     return parser.parse_args()
 
 def main():

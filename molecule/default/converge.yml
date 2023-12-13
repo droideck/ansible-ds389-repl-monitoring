@@ -8,6 +8,7 @@
   tasks:
     - name: Run Replication-Monitor role with merging functionality
       include_role:
-        name: ../../roles/Replication-Monitor
+        name: ../../roles/Replication-Monitoring
       vars:
-        csn_task_file: main.yml
+        replication_monitoring_log_dir: "/tmp"
+        replication_monitoring_result_dir: "/tmp"

@@ -1,0 +1,4 @@
+---
+replication_monitoring_lag_threshold: 60
+replication_monitoring_log_dir: '/var/log/dirsrv/slapd-localhost'
+replication_monitoring_result_dir: '/tmp'

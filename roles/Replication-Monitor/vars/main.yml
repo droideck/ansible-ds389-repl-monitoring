@@ -1,3 +1,0 @@
----
-replication_monitoring_lag_threshold: 60
-replication_monitoring_critical_lag_threshold: 120
