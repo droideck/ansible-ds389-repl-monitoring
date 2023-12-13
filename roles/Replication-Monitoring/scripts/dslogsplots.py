@@ -119,7 +119,7 @@ class LagInfo:
 
         # Draw replication monitoring threshold line
         if self.args.replication_monitoring_threshold is not None:
-            plt.axhline(y=self.args.replication_monitoring_threshold, color='r', linestyle='-', label='Replication Monitoring Threshold')
+            plt.axhline(y=self.args.replication_monitoring_threshold, color='r', linestyle='-', label='Replication Lag Threshold')
 
         plt.title('Replication lag time')
         plt.ylabel('time (s)')

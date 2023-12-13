@@ -1,5 +1,5 @@
 - name: Monitor Replication
-  hosts: all
-  become: yes
+  hosts: staging
+  become: true
   roles:
     - ../roles/Replication-Monitoring

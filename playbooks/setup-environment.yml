@@ -13,6 +13,8 @@
         state: present
       loop:
         - python-matplotlib
+      delegate_to: localhost
+      run_once: true
       when: ansible_os_family == "RedHat"
 
     - name: Ensure log directory exists
@@ -20,8 +22,3 @@
         path: "{{ replication_monitoring_log_dir }}"
         state: directory
         mode: '0755'
-
-    # debugging
-    - name: Check replication lag variable
-      ansible.builtin.debug:
-        msg: "The replication lag threshold for this group is {{ replication_monitoring_lag_threshold }} seconds."

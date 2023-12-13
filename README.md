@@ -8,8 +8,8 @@ The Ansible Replication Monitoring Project is designed to facilitate the monitor
 
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/your-org/ansible-replication-monitoring.git
-   cd ansible-replication-monitoring
+   git clone https://github.com/droideck/ansible-389ds-replication-monitoring.git
+   cd ansible-389ds-replication-monitoring
    ```
 
 2. **Install Dependencies:**
@@ -53,8 +53,8 @@ This role is designed to work with a dynamic inventory that includes all hosts p
 ### Example Playbook
 ```yaml
 - name: Monitor Replication
-  hosts: all
-  become: yes
+  hosts: staging
+  become: true
   roles:
     - ../roles/Replication-Monitoring
 ```
@@ -90,3 +90,5 @@ The project is configured with Ansible Molecule for testing using Docker. To run
 - Ensure that Python3 and Python-matplotlib are installed on all target hosts for the successful execution of this role.
 - The role assumes that access logs are present in the `replication_monitoring_log_dir`.
 - The role should be run not more often than once per hour as per current logic.
+
+Notable mentions: Thank you, Pierre Rogier (@progier389) for dslogs and dslogsplot tools!

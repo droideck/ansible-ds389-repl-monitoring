@@ -1,0 +1,3 @@
+---
+replication_monitoring_lag_threshold: 10
+replication_monitoring_result_dir: '/tmp'
