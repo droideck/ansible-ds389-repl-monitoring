@@ -2,4 +2,4 @@
   hosts: staging
   become: true
   roles:
-    - ../roles/Replication-Monitoring
+    - Replication-Monitoring

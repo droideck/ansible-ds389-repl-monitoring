@@ -1,12 +1,6 @@
 ---
 - name: Gather CSN and etime values from access logs
-  include_tasks: gather_data.yml
+  ansible.builtin.include_tasks: gather_data.yml
 
 - name: Log instances of replication lag
-  include_tasks: log_replication_lag.yml
-#
-# - name: Send notifications if critical issues are found
-#   include_tasks: send_notification.yml
-#
-- name: Clean up temporary files and directories
-  include_tasks: cleanup.yml
+  ansible.builtin.include_tasks: log_replication_lag.yml

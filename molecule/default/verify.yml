@@ -9,15 +9,13 @@
     - name: Verify necessary packages are installed on RedHat
       when: ansible_os_family == "RedHat"
       block:
-        - name: Check package {{ item }}
+        - name: Verify necessary packages are installed
           ansible.builtin.package:
             name: "{{ item }}"
             state: present
           loop:
-            - rsync
-            - openldap-clients
-            - curl
-            - jq
+            - python3
+            - python3-matplotlib
           register: package_status
           failed_when: package_status is failed
 
@@ -27,15 +25,30 @@
       register: log_dir_status
       failed_when: not log_dir_status.stat.exists or log_dir_status.stat.mode != '0755'
 
-    - name: Verify CSN values are gathered
-      assert:
-        that:
-          - "'csn_values' is defined"
-          - "csn_values | length > 0"
-        fail_msg: "CSN values were not gathered correctly"
+    - name: Verify output files are correctly generated
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: output_file
+      loop:
+        - "{{ replication_monitoring_tmp_dslogs_output_file_path }}"
+        - "{{ replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
+        - "{{ replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.png"
+      failed_when: not output_file.stat.exists
+      delegate_to: localhost
+      run_once: true
 
-    - name: Verify replication-monitor role output contains expected CSN value
-      assert:
-        that: "'656965e2000000020000' in csn_values"
-        fail_msg: "Expected CSN value not found in role output"
-        success_msg: "Expected CSN value found in role output"
+    - name: Check content of the CSV file for expected etime value
+      ansible.builtin.shell:
+        cmd: "grep '0.023748714' {{ replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
+      register: grep_result
+      failed_when: grep_result.rc != 0
+      delegate_to: localhost
+      run_once: true
+
+    - name: Check that the PNG file is not empty
+      ansible.builtin.stat:
+        path: "{{ replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.png"
+      register: png_file
+      failed_when: png_file.stat.size == 0
+      delegate_to: localhost
+      run_once: true

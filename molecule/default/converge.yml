@@ -7,8 +7,8 @@
   become: true
   tasks:
     - name: Run Replication-Monitor role with merging functionality
-      include_role:
-        name: ../../roles/Replication-Monitoring
+      ansible.builtin.include_role:
+        name: Replication-Monitoring
       vars:
         replication_monitoring_log_dir: "/tmp"
         replication_monitoring_result_dir: "/tmp"

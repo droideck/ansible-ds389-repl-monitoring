@@ -18,10 +18,11 @@
   ansible.builtin.command:
     cmd: >
       python3 {{ role_path }}/scripts/dslogsplots.py
-      -i /tmp/merged_output.json
+      -i "{{ replication_monitoring_tmp_merged_output_file_path }}"
       -c "{{ replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
       -o "{{ replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.png"
       -t {{ replication_monitoring_lag_threshold }}
+    creates: "{{ replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
   delegate_to: localhost
   run_once: true
   when: not replication_lag_files.stat.exists
