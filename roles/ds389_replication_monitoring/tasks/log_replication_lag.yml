@@ -1,0 +1,27 @@
+- name: Create a directory with current date
+  ansible.builtin.file:
+    path: "{{ ds389_replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}"
+    state: directory
+    mode: '0755'
+  delegate_to: localhost
+  run_once: true
+
+- name: Check if replication lag files exist
+  ansible.builtin.stat:
+    path: "{{ ds389_replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
+  register: replication_lag_files
+  delegate_to: localhost
+  run_once: true
+
+- name: Execute dslogsplots script on the controller to process merged logs and generate plots
+  ansible.builtin.command:
+    cmd: >
+      python3 {{ role_path }}/scripts/dslogsplots.py
+      -i "{{ ds389_replication_monitoring_tmp_merged_output_file_path }}"
+      -c "{{ ds389_replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
+      -o "{{ ds389_replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.png"
+      -t {{ ds389_replication_monitoring_lag_threshold }}
+    creates: "{{ ds389_replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
+  delegate_to: localhost
+  run_once: true
+  when: not replication_lag_files.stat.exists

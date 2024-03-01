@@ -2,32 +2,32 @@ all:
   children:
     production:
       vars:
-        replication_monitoring_lag_threshold: 20
-        replication_monitoring_result_dir: '/tmp'
+        ds389_replication_monitoring_lag_threshold: 20
+        ds389_replication_monitoring_result_dir: '/tmp'
       hosts:
         ds389_instance_1:
           ansible_host: 192.168.2.101
           ansible_user: root
           ansible_password: Password123
-          replication_monitoring_log_dir: '/var/log/dirsrv/slapd-supplier1'
+          ds389_replication_monitoring_log_dir: '/var/log/dirsrv/slapd-supplier1'
         ds389_instance_2:
           ansible_host: 192.168.2.102
           ansible_user: root
           ansible_password: Password123
-          replication_monitoring_log_dir: '/var/log/dirsrv/slapd-supplier2'
+          ds389_replication_monitoring_log_dir: '/var/log/dirsrv/slapd-supplier2'
 
     staging:
       vars:
-        replication_monitoring_lag_threshold: 20
-        replication_monitoring_result_dir: '/tmp'
+        ds389_replication_monitoring_lag_threshold: 20
+        ds389_replication_monitoring_result_dir: '/tmp'
       hosts:
         ds389_instance_1:
           ansible_host: 192.168.3.101
           ansible_user: root
           ansible_password: Password123
-          replication_monitoring_log_dir: '/var/log/dirsrv/slapd-supplier1'
+          ds389_replication_monitoring_log_dir: '/var/log/dirsrv/slapd-supplier1'
         ds389_instance_2:
           ansible_host: 192.168.3.102
           ansible_user: root
           ansible_password: Password123
-          replication_monitoring_log_dir: '/var/log/dirsrv/slapd-supplier2'
+          ds389_replication_monitoring_log_dir: '/var/log/dirsrv/slapd-supplier2'

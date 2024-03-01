@@ -1,12 +1,7 @@
----
 - name: Setup Environment for 389 DS Replication Monitoring
-  hosts: all
-  become: true
-
-  tasks:
+  block:
     - name: Test connectivity to all hosts
       ansible.builtin.ping:
-
     - name: Ensure necessary packages are installed on the controller
       ansible.builtin.package:
         name: "{{ item }}"

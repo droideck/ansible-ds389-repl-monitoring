@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Ansible Replication Monitoring Project is designed to facilitate the monitoring and logging of replication lag on 389 DS agreements across an entire topology. Utilizing CSN and etime values, the project offers capabilities to detect and log instances where replication is lagging behind a pre-defined threshold. The data is gathered and stored in the user-defined directory in CSV and PNG graph formats.
+The Ansible 389 DS Replication Monitoring Project is designed to facilitate the monitoring and logging of replication lag on 389 DS agreements across an entire topology. Utilizing CSN and etime values, the project offers capabilities to detect and log instances where replication is lagging behind a pre-defined threshold. The data is gathered and stored in the user-defined directory in CSV and PNG graph formats.
 
 ## Installation
 
@@ -27,21 +27,21 @@ ansible-playbook playbooks/setup-environment.yml -i inventory/your_inventory.yml
 
 ### Monitoring Replication
 
-Execute the `monitor-replication.yml` playbook to start monitoring replication. This playbook includes the Replication-Monitoring role to gather CSN and etime values and check for replication lags. After that, the role stores the monitored data into the user-defined directory.
+Execute the `monitor-replication.yml` playbook to start monitoring replication. This playbook includes the ds389_replication_monitoring role to gather CSN and etime values and check for replication lags. After that, the role stores the monitored data into the user-defined directory.
 
 ```bash
 ansible-playbook playbooks/monitor-replication.yml -i inventory/your_inventory.yml
 ```
 
-## Replication-Monitoring Role
+## ds389_replication_monitoring Role
 
 ### Role Description
-The Replication-Monitoring role is an integral part of the Ansible Replication Monitoring Project. It is responsible for gathering CSN and etime values from 389 DS access logs, detecting replication lags based on predefined thresholds, and logging this information for analysis.
+The ds389_replication_monitoring role is an integral part of the Ansible 389 DS Replication Monitoring Project. It is responsible for gathering CSN and etime values from 389 DS access logs, detecting replication lags based on predefined thresholds, and logging this information for analysis.
 
 ### Role Variables
-- `replication_monitoring_log_dir`: The directory where replication logs are stored.
-- `replication_monitoring_result_dir`: Directory for storing the output results like CSV and PNG files.
-- `replication_monitoring_lag_threshold`: Threshold in seconds for what constitutes a replication lag.
+- `ds389_replication_monitoring_log_dir`: The directory where replication logs are stored.
+- `ds389_replication_monitoring_result_dir`: Directory for storing the output results like CSV and PNG files.
+- `ds389_replication_monitoring_lag_threshold`: Threshold in seconds for what constitutes a replication lag.
 
 ### Inventory Requirements
 This role is designed to work with a dynamic inventory that includes all hosts participating in the 389 DS topology.
@@ -56,7 +56,7 @@ This role is designed to work with a dynamic inventory that includes all hosts p
   hosts: staging
   become: true
   roles:
-    - ../roles/Replication-Monitoring
+    - ../roles/ds389_replication_monitoring
 ```
 
 ## Testing
@@ -88,7 +88,7 @@ The project is configured with Ansible Molecule for testing using Docker. To run
 
 ## Additional Notes
 - Ensure that Python3 and Python-matplotlib are installed on all target hosts for the successful execution of this role.
-- The role assumes that access logs are present in the `replication_monitoring_log_dir`.
+- The role assumes that access logs are present in the `ds389_replication_monitoring_log_dir`.
 - The role should be run not more often than once per hour as per current logic.
 
 Notable mentions: Thank you, Pierre Rogier (@progier389) for dslogs and dslogsplot tools!

@@ -1,8 +1,0 @@
----
-replication_monitoring_lag_threshold: 10
-replication_monitoring_result_dir: '/tmp'
-
-replication_monitoring_tmp_path: "/tmp"
-replication_monitoring_tmp_dslogs_script_path: "{{ replication_monitoring_tmp_path }}/dslogs.py"
-replication_monitoring_tmp_dslogs_output_file_path: "{{ replication_monitoring_tmp_path }}/{{ inventory_hostname }}_dslogs_output.json"
-replication_monitoring_tmp_merged_output_file_path: "{{ replication_monitoring_tmp_path }}/merged_output.json"

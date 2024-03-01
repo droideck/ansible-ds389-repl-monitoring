@@ -8,7 +8,7 @@
   tasks:
     - name: Run Replication-Monitor role with merging functionality
       ansible.builtin.include_role:
-        name: Replication-Monitoring
+        name: ds389_replication_monitoring
       vars:
-        replication_monitoring_log_dir: "/tmp"
-        replication_monitoring_result_dir: "/tmp"
+        ds389_replication_monitoring_log_dir: "/tmp"
+        ds389_replication_monitoring_result_dir: "/tmp"

@@ -1,0 +1,8 @@
+---
+ds389_replication_monitoring_lag_threshold: 10
+ds389_replication_monitoring_result_dir: '/tmp'
+
+ds389_replication_monitoring_tmp_path: "/tmp"
+ds389_replication_monitoring_tmp_dslogs_script_path: "{{ ds389_replication_monitoring_tmp_path }}/dslogs.py"
+ds389_replication_monitoring_tmp_dslogs_output_file_path: "{{ ds389_replication_monitoring_tmp_path }}/{{ inventory_hostname }}_dslogs_output.json"
+ds389_replication_monitoring_tmp_merged_output_file_path: "{{ ds389_replication_monitoring_tmp_path }}/merged_output.json"
