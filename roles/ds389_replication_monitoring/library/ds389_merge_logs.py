@@ -105,6 +105,15 @@ def process_file(file_path, module):
     except Exception as e:
         module.fail_json(msg=f"Failed to read {file_path}: {str(e)}")
 
+
+def read_existing_json(output_path):
+    try:
+        with open(output_path, 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return None
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -117,6 +126,10 @@ def main():
     files = module.params['files']
     output = module.params['output']
 
+    if module.check_mode:
+        # In check mode, don't make any changes but exit successfully.
+        module.exit_json(changed=False)
+
     try:
         json_processed_list = []
         for file_path in files:
@@ -125,12 +138,19 @@ def main():
                 json_processed_list.append(json_obj)
         merged_result = merge_jsons(json_processed_list)
 
-        with open(output, 'w') as outfile:
-            json.dump(merged_result, outfile, indent=4)
-        module.exit_json(changed=True, message="JSON merged successfully")
+        existing_json = read_existing_json(output)
+
+        if existing_json == merged_result:
+            # If existing JSON matches the new merged JSON, exit without making changes.
+            module.exit_json(changed=False, message="No changes required, JSON matches existing file.")
+        else:
+            with open(output, 'w') as outfile:
+                json.dump(merged_result, outfile, indent=4)
+            module.exit_json(changed=True, message="JSON merged successfully")
 
     except Exception as e:
         module.fail_json(msg=str(e))
+
 
 if __name__ == '__main__':
     main()

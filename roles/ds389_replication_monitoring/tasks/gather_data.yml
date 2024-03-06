@@ -25,8 +25,11 @@
     flat: true
 
 - name: Gather all analysis output file paths
-  set_fact:
-    analysis_output_files: "{{ groups['all'] | map('extract', hostvars, 'ds389_replication_monitoring_tmp_path') | map('add', '/' + inventory_hostname + '_analysis_output.json') | list }}"
+  ansible.builtin.set_fact:
+    analysis_output_files: "{{ groups['all'] | map('extract', hostvars, 'ds389_replication_monitoring_tmp_path')
+                 | zip(groups['all']) | map('join', '/')
+                 | map('regex_replace', '$', '_analysis_output.json')
+                 | list }}"
 
 - name: Merge analysis outputs on the controller
   ds389_merge_logs:
