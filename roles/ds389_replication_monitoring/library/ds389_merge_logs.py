@@ -23,32 +23,38 @@ options:
     output:
         description:
             - The path to the output file where the merged JSON will be saved.
-            - If not provided, the merged JSON will be returned in the module's output.
-        required: false
+        required: true
         type: str
 author:
     - Simon Pichugin (@droideck)
 '''
 
 EXAMPLES = '''
-# Merge JSON logs and save to a file
-- merge_json_logs:
-    files: ["/path/to/log1.json", "/path/to/log2.json"]
+---
+- name: Merge JSON logs
+  ds389_merge_logs:
+    files:
+      - "/path/to/log1.json"
+      - "/path/to/log2.json"
+      - "/path/to/log3.json"
     output: "/path/to/merged_log.json"
+  register: merge_result
 
-# Merge JSON logs and get the result in a variable
-- merge_json_logs:
-    files: ["/path/to/log1.json", "/path/to/log2.json"]
-  register: merged_logs
+- name: Display merge result
+  debug:
+    msg: "{{ merge_result.message }}"
+
+- name: Merge JSON logs with dynamic list
+  ds389_merge_logs:
+    files: "{{ list_of_logs }}"
+    output: "/path/to/dynamic_merged_log.json"
+  register: dynamic_merge_result
+
+- name: Display dynamic merge result
+  debug:
+    msg: "{{ dynamic_merge_result.message }}"
 '''
 
-RETURN = '''
-message:
-    description: Success message.
-    returned: always
-    type: str
-    sample: JSON merged successfully
-'''
 
 from ansible.module_utils.basic import AnsibleModule
 import json
@@ -99,6 +105,15 @@ def process_file(file_path, module):
     except Exception as e:
         module.fail_json(msg=f"Failed to read {file_path}: {str(e)}")
 
+
+def read_existing_json(output_path):
+    try:
+        with open(output_path, 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return None
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -111,6 +126,10 @@ def main():
     files = module.params['files']
     output = module.params['output']
 
+    if module.check_mode:
+        # In check mode, don't make any changes but exit successfully.
+        module.exit_json(changed=False)
+
     try:
         json_processed_list = []
         for file_path in files:
@@ -119,15 +138,19 @@ def main():
                 json_processed_list.append(json_obj)
         merged_result = merge_jsons(json_processed_list)
 
-        if output:
+        existing_json = read_existing_json(output)
+
+        if existing_json == merged_result:
+            # If existing JSON matches the new merged JSON, exit without making changes.
+            module.exit_json(changed=False, message="No changes required, JSON matches existing file.")
+        else:
             with open(output, 'w') as outfile:
                 json.dump(merged_result, outfile, indent=4)
             module.exit_json(changed=True, message="JSON merged successfully")
-        else:
-            module.exit_json(changed=False, merged_json=merged_result)
 
     except Exception as e:
         module.fail_json(msg=str(e))
+
 
 if __name__ == '__main__':
     main()

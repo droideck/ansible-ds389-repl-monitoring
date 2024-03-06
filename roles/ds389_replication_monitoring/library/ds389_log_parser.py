@@ -43,7 +43,6 @@ EXAMPLES = '''
       - /var/log/dirsrv/slapd-replica2/access
     anonymous: true
     output_file: /path/to/output_file.json
-  register: replication_data
 '''
 
 from ansible.module_utils.basic import AnsibleModule

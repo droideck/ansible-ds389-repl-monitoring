@@ -9,58 +9,31 @@
     msg: "No log files found in {{ ds389_replication_monitoring_log_dir }}"
   when: log_files.files | length == 0
 
-- name: Get checksum of local dslogs.py script
-  ansible.builtin.stat:
-    path: "{{ role_path }}/scripts/dslogs.py"
-    get_checksum: true
-    get_mime: true
-  delegate_to: localhost
-  register: local_dslogs_script_checksum
-  run_once: true
-
-- name: Check if dslogs.py script exists with the same checksum on the target machine
-  ansible.builtin.stat:
-    path: "{{ ds389_replication_monitoring_tmp_dslogs_script_path }}"
-    get_checksum: true
-    get_mime: true
-  register: remote_dslogs_script
-
-- name: Copy dslogs script to the target machine if checksum differs or file doesn't exist
-  ansible.builtin.copy:
-    src: "{{ role_path }}/scripts/dslogs.py"
-    dest: "{{ ds389_replication_monitoring_tmp_dslogs_script_path }}"
-    mode: "0755"
-  when: >
-    not remote_dslogs_script.stat.exists or
-    remote_dslogs_script.stat.checksum != local_dslogs_script_checksum.stat.checksum
-
-- name: Execute dslogs script with output file option
-  ansible.builtin.command:
-    cmd: >
-      python3 {{ ds389_replication_monitoring_tmp_dslogs_script_path }}
-      {% for file in log_files.files %}
-      {% set normalized_dir = ds389_replication_monitoring_log_dir | regex_replace('/$', '') %}
-      {% if file.path.startswith(normalized_dir + '/access') %}
-      {{ file.path }}
-      {% endif %}
-      {% endfor %}
-      -o "{{ ds389_replication_monitoring_tmp_dslogs_output_file_path }}"
-    chdir: "{{ ds389_replication_monitoring_log_dir }}"
-    creates: "{{ ds389_replication_monitoring_tmp_dslogs_output_file_path }}"
+- name: Analyze replication logs and write to file for each log file
+  ds389_log_parser:
+    logfiles: "{{ log_files.files | map(attribute='path') | list }}"
+    anonymous: true
+    output_file: "{{ ds389_replication_monitoring_tmp_analysis_output_file_path }}"
+  loop: "{{ log_files.files }}"
+  loop_control:
+    loop_var: log_file
 
 - name: Copy dslogs output file to controller with server name in filename
   ansible.builtin.fetch:
-    src: "{{ ds389_replication_monitoring_tmp_dslogs_output_file_path }}"
-    dest: "{{ ds389_replication_monitoring_tmp_dslogs_output_file_path }}"
+    src: "{{ ds389_replication_monitoring_tmp_analysis_output_file_path }}"
+    dest: "{{ ds389_replication_monitoring_tmp_analysis_output_file_path }}"
     flat: true
 
-- name: Run merge_dslogs script on the controller
-  ansible.builtin.command:
-    cmd: >
-      python3 {{ role_path }}/scripts/merge_dslogs.py -o {{ ds389_replication_monitoring_tmp_merged_output_file_path }}
-      {% for host in groups['all'] %}
-      "{{ ds389_replication_monitoring_tmp_path }}/{{ hostvars[host]['inventory_hostname'] }}_dslogs_output.json"
-      {% endfor %}
-    creates: "{{ ds389_replication_monitoring_tmp_merged_output_file_path }}"
+- name: Gather all analysis output file paths
+  ansible.builtin.set_fact:
+    analysis_output_files: "{{ groups['all'] | map('extract', hostvars, 'ds389_replication_monitoring_tmp_path')
+                 | zip(groups['all']) | map('join', '/')
+                 | map('regex_replace', '$', '_analysis_output.json')
+                 | list }}"
+
+- name: Merge analysis outputs on the controller
+  ds389_merge_logs:
+    files: "{{ analysis_output_files }}"
+    output: "{{ ds389_replication_monitoring_tmp_merged_output_file_path }}"
   delegate_to: localhost
   run_once: true

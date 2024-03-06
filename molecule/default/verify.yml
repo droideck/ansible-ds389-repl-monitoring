@@ -30,7 +30,7 @@
         path: "{{ item }}"
       register: output_file
       loop:
-        - "{{ ds389_replication_monitoring_tmp_dslogs_output_file_path }}"
+        - "{{ ds389_replication_monitoring_tmp_analysis_output_file_path }}"
         - "{{ ds389_replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
         - "{{ ds389_replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.png"
       failed_when: not output_file.stat.exists
