@@ -5,7 +5,7 @@
 
 - name: Remove temporary dslogs output files from the target machine
   ansible.builtin.file:
-    path: "{{ ds389_replication_monitoring_tmp_dslogs_output_file_path }}"
+    path: "{{ ds389_replication_monitoring_tmp_analysis_output_file_path }}"
     state: absent
 
 - name: Remove merged_output.json from the controller
