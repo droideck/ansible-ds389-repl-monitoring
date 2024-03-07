@@ -39,7 +39,15 @@
 
     - name: Check content of the CSV file for expected etime value
       ansible.builtin.shell:
-        cmd: "grep '0.023748714' {{ ds389_replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
+        cmd: "grep '0.087274515' {{ ds389_replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
+      register: grep_result
+      failed_when: grep_result.rc != 0
+      delegate_to: localhost
+      run_once: true
+
+    - name: Check content of the CSV file for expected lag value
+      ansible.builtin.shell:
+        cmd: "grep '5.879752159118652' {{ ds389_replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
       register: grep_result
       failed_when: grep_result.rc != 0
       delegate_to: localhost

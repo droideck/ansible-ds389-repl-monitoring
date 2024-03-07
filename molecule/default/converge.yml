@@ -1,7 +1,4 @@
 ---
-- name: Converge - Setup Environment
-  ansible.builtin.import_playbook: ../../playbooks/setup-environment.yml
-
 - name: Converge - Gather CSN and Merge Logs
   hosts: all
   become: true
