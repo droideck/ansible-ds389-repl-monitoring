@@ -1,0 +1,13 @@
+---
+ds389_repl_monitoring_lag_threshold: 10
+ds389_repl_monitoring_result_dir: '/tmp'
+
+ds389_repl_monitoring_only_fully_replicated: false
+ds389_repl_monitoring_only_not_replicated: false
+ds389_repl_monitoring_lag_time_lowest: 0
+ds389_repl_monitoring_etime_lowest: 0
+ds389_repl_monitoring_utc_offset: 0
+
+ds389_repl_monitoring_tmp_path: "/tmp"
+ds389_repl_monitoring_tmp_analysis_output_file_path: "{{ ds389_repl_monitoring_tmp_path }}/{{ inventory_hostname }}_analysis_output.json"
+ds389_repl_monitoring_tmp_merged_output_file_path: "{{ ds389_repl_monitoring_tmp_path }}/merged_output.json"

@@ -1,5 +1,5 @@
 ---
-- name: Setup the environment for the ds389_replication_monitoring role
+- name: Setup the environment for the ds389_repl_monitoring role
   ansible.builtin.include_tasks: setup.yml
 
 - name: Gather CSN and etime values from access logs

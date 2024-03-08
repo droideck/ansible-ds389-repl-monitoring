@@ -10,63 +10,55 @@
 DOCUMENTATION = '''
 ---
 module: ds389_logs_plot
-short_description: Plots 389 Directory Server log data from JSON files
+short_description: Plots 389 Directory Server log data from JSON file
 description:
     - This module processes a JSON file containing 389 Directory Server (DS) log data to plot replication lag and execution time (etime) over time.
-    - It can also generate a CSV file containing the plotted data.
 options:
     input:
         description:
             - Path to the input JSON file containing the log data.
         required: true
         type: str
-    csv:
+    csv_output_path:
         description:
             - Path where the CSV file should be generated.
             - If not specified, no CSV file will be created.
-        required: false
+        required: true
         type: str
-    output:
+    png_output_path:
         description:
             - Path where the plot image should be saved.
             - If not specified, the plot will be saved to a temporary file and its path returned.
         required: false
         type: str
-    fully_replicated:
+    only_fully_replicated:
         description:
             - Filter to show only changes replicated on all replicas.
         required: false
         type: bool
         default: false
-    not_replicated:
+    only_not_replicated:
         description:
             - Filter to show only changes not replicated on all replicas.
         required: false
         type: bool
         default: false
-    lag_time:
+    lag_time_lowest:
         description:
             - Filter to show only changes with lag time greater than or equal to the specified value.
         required: false
         type: float
-    etime:
+    etime_lowest:
         description:
             - Filter to show only changes with execution time (etime) greater than or equal to the specified value.
         required: false
         type: float
-    index:
-        description:
-            - List of indices to include in the analysis.
-            - If not specified, all indices are included.
-        required: false
-        type: list
-        elements: int
     utc_offset:
         description:
             - UTC offset in seconds for timezone adjustment.
         required: false
         type: int
-    replication_monitoring_threshold:
+    repl_lag_threshold:
         description:
             - Replication monitoring threshold value.
             - A horizontal line will be drawn in the plot to represent this threshold.
@@ -80,24 +72,19 @@ EXAMPLES = '''
 - name: Plot 389 DS log data and generate CSV
   dslogs_plot:
     input: "/path/to/log_data.json"
-    csv: "/path/to/output_data.csv"
-    output: "/path/to/plot.png"
-    fully_replicated: yes
-    lag_time: 10
+    csv_output_path: "/path/to/output_data.csv"
+    png_output_path: "/path/to/plot.png"
+    only_fully_replicated: yes
+    lag_time_lowest: 10
     utc_offset: -3600
     replication_monitoring_threshold: 5
 
-- name: Plot 389 DS log data without generating CSV
+- name: Generate 389 DS log data CSV with minimap etime and only not replicated changes
   dslogs_plot:
     input: "/path/to/log_data.json"
-    output: "/path/to/plot.png"
-    not_replicated: yes
-    etime: 2.5
-
-- name: Generate CSV without plotting
-  dslogs_plot:
-    input: "/path/to/log_data.json"
-    csv: "/path/to/output_data.csv"
+    csv_output_path: "/path/to/output_data.csv"
+    only_not_replicated: yes
+    etime_lowest: 2.5
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -146,7 +133,7 @@ class LagInfo:
         self.log_files = None
         self.tz = None
         self.lag = []
-        self.index_list = module_params['index'] if module_params['index'] else []
+        self.index_list = []
         self._setup_timezone()
 
     def _setup_timezone(self):
@@ -161,13 +148,13 @@ class LagInfo:
             return "?"
 
     def is_filtered(self, csninfo):
-        if self.module_params['fully_replicated'] and len(self.index_list) != len(csninfo.replicated_on):
+        if self.module_params['only_fully_replicated'] and len(self.index_list) != len(csninfo.replicated_on):
             return True
-        if self.module_params['not_replicated'] and len(self.index_list) == len(csninfo.replicated_on):
+        if self.module_params['only_not_replicated'] and len(self.index_list) == len(csninfo.replicated_on):
             return True
-        if self.module_params['lag_time'] and csninfo.lag_time[0] <= self.module_params['lag_time']:
+        if self.module_params['lag_time_lowest'] and csninfo.lag_time[0] <= self.module_params['lag_time_lowest']:
             return True
-        if self.module_params['etime'] and csninfo.etime[0] <= self.module_params['etime']:
+        if self.module_params['etime_lowest'] and csninfo.etime[0] <= self.module_params['etime_lowest']:
             return True
         return False
 
@@ -175,8 +162,7 @@ class LagInfo:
         json_dict = json.load(fd)
         self.utc_offset = json_dict["utc-offset"]
         self.log_files = json_dict["log-files"]
-        if not self.module_params['index']:
-            self.index_list = list(range(len(self.log_files)))
+        self.index_list = list(range(len(self.log_files)))
         self._setup_timezone()
         for csn, csninfo in json_dict['lag'].items():
             info = CsnInfo(csn)
@@ -196,41 +182,36 @@ class LagInfo:
         ydata = [i.lag_time[0] for i in self.lag]
         edata = [i.etime[0] for i in self.lag]
 
-        # CSV output
-        if self.module_params['csv']:
+        if self.module_params['csv_lowest']:
             try:
-                with open(self.module_params['csv'], "w", encoding="utf-8") as csv_file:
+                with open(self.module_params['csv_lowest'], "w", encoding="utf-8") as csv_file:
                     csv_file.write("timestamp,lag,etime\n")
                     for idx in range(len(xdata)):
                         timestamp = xdata[idx].strftime('%Y-%m-%d %H:%M:%S') if xdata[idx] != "?" else "?"
                         csv_file.write(f"{timestamp},{ydata[idx]},{edata[idx]}\n")
             except Exception as e:
-                module.fail_json(msg=f"Failed to write CSV file {self.module_params['csv']}: {e}")
+                module.fail_json(msg=f"Failed to write CSV file {self.module_params['csv_lowest']}: {e}")
 
         plt.plot(xdata, ydata, label='lag')
         plt.plot(xdata, edata, label='etime')
 
-        if self.module_params['replication_monitoring_threshold'] is not None:
-            plt.axhline(y=self.module_params['replication_monitoring_threshold'], color='r', linestyle='-', label='Replication Lag Threshold')
+        if self.module_params['repl_lag_threshold'] is not None:
+            plt.axhline(y=self.module_params['repl_lag_threshold'], color='r', linestyle='-', label='Replication Lag Threshold')
 
         plt.title('Replication lag time')
         plt.ylabel('time (s)')
         plt.xlabel(f'log time (starting on {starting_time})')
         plt.legend()
 
-        if self.module_params['output']:
-            plt.savefig(self.module_params['output'])
-            message = f"Plot saved to {self.module_params['output']}"
-            if self.module_params['csv']:
-                message += f" and CSV data saved to {self.module_params['csv']}"
-            module.exit_json(changed=True, message=message)
+        if self.module_params['csv_output_path']:
+            message = f"CSV data saved to {self.module_params['csv_output_path']}"
         else:
-            plot_path = "/tmp/ansible_dslogs_plot.png"
-            plt.savefig(plot_path)
-            message = "Plot generated at /tmp/ansible_dslogs_plot.png"
-            if self.module_params['csv']:
-                message += f" and CSV data saved to {self.module_params['csv']}"
-            module.exit_json(changed=False, message=message)
+            module.fail_json(msg=f"CSV path (csv_output_path:) is requred")
+
+        if self.module_params['png_output_path']:
+            plt.savefig(self.module_params['png_output_path'])
+            message += f" And plot saved to {self.module_params['png_output_path']}"
+        module.exit_json(changed=True, message=message)
 
 
 def main():
@@ -239,13 +220,12 @@ def main():
             input=dict(type='str', required=True),
             csv=dict(type='str', required=False),
             output=dict(type='str', required=False),
-            fully_replicated=dict(type='bool', default=False),
-            not_replicated=dict(type='bool', default=False),
-            lag_time=dict(type='float', required=False),
-            etime=dict(type='float', required=False),
-            index=dict(type='list', elements='int', required=False),
+            only_fully_replicated=dict(type='bool', default=False),
+            only_not_replicated=dict(type='bool', default=False),
+            lag_time_lowest=dict(type='float', required=False),
+            etime_lowest=dict(type='float', required=False),
             utc_offset=dict(type='int', required=False),
-            replication_monitoring_threshold=dict(type='float', required=False)
+            repl_lag_threshold=dict(type='float', required=False)
         ),
         supports_check_mode=True
     )

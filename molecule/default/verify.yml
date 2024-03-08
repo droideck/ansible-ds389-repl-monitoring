@@ -21,7 +21,7 @@
 
     - name: Verify log directory exists with correct permissions
       ansible.builtin.stat:
-        path: "{{ ds389_replication_monitoring_log_dir }}"
+        path: "{{ ds389_repl_monitoring_log_dir }}"
       register: log_dir_status
       failed_when: not log_dir_status.stat.exists or log_dir_status.stat.mode != '0755'
 
@@ -30,16 +30,16 @@
         path: "{{ item }}"
       register: output_file
       loop:
-        - "{{ ds389_replication_monitoring_tmp_analysis_output_file_path }}"
-        - "{{ ds389_replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
-        - "{{ ds389_replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.png"
+        - "{{ ds389_repl_monitoring_tmp_analysis_output_file_path }}"
+        - "{{ ds389_repl_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
+        - "{{ ds389_repl_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.png"
       failed_when: not output_file.stat.exists
       delegate_to: localhost
       run_once: true
 
     - name: Check content of the CSV file for expected etime value
       ansible.builtin.shell:
-        cmd: "grep '0.087274515' {{ ds389_replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
+        cmd: "grep '0.087274515' {{ ds389_repl_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
       register: grep_result
       failed_when: grep_result.rc != 0
       delegate_to: localhost
@@ -47,7 +47,7 @@
 
     - name: Check content of the CSV file for expected lag value
       ansible.builtin.shell:
-        cmd: "grep '5.879752159118652' {{ ds389_replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
+        cmd: "grep '5.879752159118652' {{ ds389_repl_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
       register: grep_result
       failed_when: grep_result.rc != 0
       delegate_to: localhost
@@ -55,7 +55,7 @@
 
     - name: Check that the PNG file is not empty
       ansible.builtin.stat:
-        path: "{{ ds389_replication_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.png"
+        path: "{{ ds389_repl_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.png"
       register: png_file
       failed_when: png_file.stat.size == 0
       delegate_to: localhost

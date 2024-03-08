@@ -15,6 +15,6 @@
 
     - name: Ensure log directory exists
       ansible.builtin.file:
-        path: "{{ ds389_replication_monitoring_log_dir }}"
+        path: "{{ ds389_repl_monitoring_log_dir }}"
         state: directory
         mode: '0755'

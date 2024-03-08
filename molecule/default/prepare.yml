@@ -5,5 +5,5 @@
     - name: Copy mock accesslog files to the respective test containers
       ansible.builtin.copy:
         src: "./files/mock_accesslog{{ hostvars[inventory_hostname].ansible_hostname | regex_replace('^instance', '') }}"
-        dest: "{{ ds389_replication_monitoring_log_dir }}/accesslog{{ hostvars[inventory_hostname].ansible_hostname | regex_replace('^instance', '') }}"
+        dest: "{{ ds389_repl_monitoring_log_dir }}/accesslog{{ hostvars[inventory_hostname].ansible_hostname | regex_replace('^instance', '') }}"
         mode: '0644'

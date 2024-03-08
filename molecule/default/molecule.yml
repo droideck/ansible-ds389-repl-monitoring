@@ -45,9 +45,9 @@ provisioner:
   inventory:
     group_vars:
       all:
-        ds389_replication_monitoring_log_dir: "/tmp"
-        ds389_replication_monitoring_result_dir: "/tmp"
-        ds389_replication_monitoring_lag_threshold: 1
-        ds389_replication_monitoring_tmp_path: "/tmp"
-        ds389_replication_monitoring_tmp_analysis_output_file_path: "{{ ds389_replication_monitoring_tmp_path }}/{{ inventory_hostname }}_analysis_output.json"
-        ds389_replication_monitoring_tmp_merged_output_file_path: "{{ ds389_replication_monitoring_tmp_path }}/merged_output.json"
+        ds389_repl_monitoring_log_dir: "/tmp"
+        ds389_repl_monitoring_result_dir: "/tmp"
+        ds389_repl_monitoring_lag_threshold: 1
+        ds389_repl_monitoring_tmp_path: "/tmp"
+        ds389_repl_monitoring_tmp_analysis_output_file_path: "{{ ds389_repl_monitoring_tmp_path }}/{{ inventory_hostname }}_analysis_output.json"
+        ds389_repl_monitoring_tmp_merged_output_file_path: "{{ ds389_repl_monitoring_tmp_path }}/merged_output.json"

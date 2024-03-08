@@ -1,32 +1,32 @@
 - name: Find all log files in the replication monitoring directory
   ansible.builtin.find:
-    paths: "{{ ds389_replication_monitoring_log_dir }}"
+    paths: "{{ ds389_repl_monitoring_log_dir }}"
     patterns: "access*"
   register: log_files
 
 - name: Check if log files exist
   ansible.builtin.fail:
-    msg: "No log files found in {{ ds389_replication_monitoring_log_dir }}"
+    msg: "No log files found in {{ ds389_repl_monitoring_log_dir }}"
   when: log_files.files | length == 0
 
 - name: Analyze replication logs and write to file for each log file
   ds389_log_parser:
     logfiles: "{{ log_files.files | map(attribute='path') | list }}"
     anonymous: true
-    output_file: "{{ ds389_replication_monitoring_tmp_analysis_output_file_path }}"
+    output_file: "{{ ds389_repl_monitoring_tmp_analysis_output_file_path }}"
   loop: "{{ log_files.files }}"
   loop_control:
     loop_var: log_file
 
 - name: Copy dslogs output file to controller with server name in filename
   ansible.builtin.fetch:
-    src: "{{ ds389_replication_monitoring_tmp_analysis_output_file_path }}"
-    dest: "{{ ds389_replication_monitoring_tmp_analysis_output_file_path }}"
+    src: "{{ ds389_repl_monitoring_tmp_analysis_output_file_path }}"
+    dest: "{{ ds389_repl_monitoring_tmp_analysis_output_file_path }}"
     flat: true
 
 - name: Gather all analysis output file paths
   ansible.builtin.set_fact:
-    analysis_output_files: "{{ groups['all'] | map('extract', hostvars, 'ds389_replication_monitoring_tmp_path')
+    analysis_output_files: "{{ groups['all'] | map('extract', hostvars, 'ds389_repl_monitoring_tmp_path')
                  | zip(groups['all']) | map('join', '/')
                  | map('regex_replace', '$', '_analysis_output.json')
                  | list }}"
@@ -34,6 +34,6 @@
 - name: Merge analysis outputs on the controller
   ds389_merge_logs:
     files: "{{ analysis_output_files }}"
-    output: "{{ ds389_replication_monitoring_tmp_merged_output_file_path }}"
+    output: "{{ ds389_repl_monitoring_tmp_merged_output_file_path }}"
   delegate_to: localhost
   run_once: true

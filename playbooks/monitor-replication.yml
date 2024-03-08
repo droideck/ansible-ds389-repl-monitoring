@@ -2,4 +2,4 @@
   hosts: staging
   become: true
   roles:
-    - ds389_replication_monitoring
+    - ds389_repl_monitoring
