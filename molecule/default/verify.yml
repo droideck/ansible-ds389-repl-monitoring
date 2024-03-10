@@ -1,7 +1,6 @@
 ---
 - name: Verify
   hosts: all
-  become: true
   tasks:
     - name: Verify connectivity to all hosts
       ansible.builtin.ping:
@@ -23,7 +22,7 @@
       ansible.builtin.stat:
         path: "{{ ds389_repl_monitoring_log_dir }}"
       register: log_dir_status
-      failed_when: not log_dir_status.stat.exists or log_dir_status.stat.mode != '0755'
+      failed_when: not log_dir_status.stat.exists or log_dir_status.stat.mode != '0750'
 
     - name: Verify output files are correctly generated
       ansible.builtin.stat:

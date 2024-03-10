@@ -1,0 +1,16 @@
+galaxy_info:
+  author: Simon Pichugin
+  description: Ansible role to monitor replication lag in 389 Directory Server instances
+  license: GPL-3.0-or-later
+  min_ansible_version: 2.9
+  platforms:
+    - name: Fedora
+      versions:
+        - all
+  galaxy_tags:
+    - 389ds
+    - directory
+    - replication
+    - monitoring
+
+dependencies: []

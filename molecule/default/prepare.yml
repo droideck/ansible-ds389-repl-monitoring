@@ -1,6 +1,5 @@
 - name: Prepare
   hosts: all
-  become: true
   tasks:
     - name: Copy mock accesslog files to the respective test containers
       ansible.builtin.copy:

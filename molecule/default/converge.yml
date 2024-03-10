@@ -1,7 +1,6 @@
 ---
 - name: Converge - Gather CSN and Merge Logs
   hosts: all
-  become: true
   tasks:
     - name: Run Replication-Monitor role with merging functionality
       ansible.builtin.include_role:

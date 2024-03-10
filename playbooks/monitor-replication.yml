@@ -1,5 +1,4 @@
 - name: Monitor Replication
   hosts: staging
-  become: true
   roles:
     - ds389_repl_monitoring

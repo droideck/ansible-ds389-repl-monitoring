@@ -1,13 +1,40 @@
 ---
+# Threshold for replication lag monitoring (in seconds)
+# It will draw a line in the plot to indicate the threshold value
 ds389_repl_monitoring_lag_threshold: 10
+
+# Directory to store replication monitoring results
+# The generated CSV and PNG files will be saved in this directory
 ds389_repl_monitoring_result_dir: '/tmp'
 
+# Filter to show only changes replicated on all replicas
+# If set to true, only changes that have been replicated to all replicas will be considered
 ds389_repl_monitoring_only_fully_replicated: false
+
+# Filter to show only changes not replicated on all replicas
+# If set to true, only changes that have not been replicated to all replicas will be considered
 ds389_repl_monitoring_only_not_replicated: false
+
+# Filter to show only changes with lag time greater than or equal to the specified value (in seconds)
+# Changes with a lag time lower than this value will be excluded from the monitoring results
 ds389_repl_monitoring_lag_time_lowest: 0
+
+# Filter to show only changes with execution time (etime) greater than or equal to the specified value (in seconds)
+# Changes with an execution time lower than this value will be excluded from the monitoring results
 ds389_repl_monitoring_etime_lowest: 0
+
+# UTC offset in seconds for timezone adjustment
+# This value will be used to adjust the log timestamps to the desired timezone
 ds389_repl_monitoring_utc_offset: 0
 
+# Temporary directory path for storing intermediate files
+# This directory will be used to store temporary files generated during the monitoring process
 ds389_repl_monitoring_tmp_path: "/tmp"
+
+# Path to the temporary analysis output file for each host
+# This file will contain the parsed replication data for each individual host
 ds389_repl_monitoring_tmp_analysis_output_file_path: "{{ ds389_repl_monitoring_tmp_path }}/{{ inventory_hostname }}_analysis_output.json"
+
+# Path to the temporary merged output file
+# This file will contain the merged replication data from all hosts
 ds389_repl_monitoring_tmp_merged_output_file_path: "{{ ds389_repl_monitoring_tmp_path }}/merged_output.json"

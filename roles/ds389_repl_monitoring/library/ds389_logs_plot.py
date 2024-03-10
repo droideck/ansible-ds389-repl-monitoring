@@ -77,7 +77,7 @@ EXAMPLES = '''
     only_fully_replicated: yes
     lag_time_lowest: 10
     utc_offset: -3600
-    replication_monitoring_threshold: 5
+    repl_lag_threshold: 5
 
 - name: Generate 389 DS log data CSV with minimap etime and only not replicated changes
   dslogs_plot:
@@ -182,15 +182,15 @@ class LagInfo:
         ydata = [i.lag_time[0] for i in self.lag]
         edata = [i.etime[0] for i in self.lag]
 
-        if self.module_params['csv_lowest']:
+        if self.module_params['csv_output_path']:
             try:
-                with open(self.module_params['csv_lowest'], "w", encoding="utf-8") as csv_file:
+                with open(self.module_params['csv_output_path'], "w", encoding="utf-8") as csv_file:
                     csv_file.write("timestamp,lag,etime\n")
                     for idx in range(len(xdata)):
                         timestamp = xdata[idx].strftime('%Y-%m-%d %H:%M:%S') if xdata[idx] != "?" else "?"
                         csv_file.write(f"{timestamp},{ydata[idx]},{edata[idx]}\n")
             except Exception as e:
-                module.fail_json(msg=f"Failed to write CSV file {self.module_params['csv_lowest']}: {e}")
+                module.fail_json(msg=f"Failed to write CSV file {self.module_params['csv_output_path']}: {e}")
 
         plt.plot(xdata, ydata, label='lag')
         plt.plot(xdata, edata, label='etime')
@@ -218,8 +218,8 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             input=dict(type='str', required=True),
-            csv=dict(type='str', required=False),
-            output=dict(type='str', required=False),
+            csv_output_path=dict(type='str', required=False),
+            png_output_path=dict(type='str', required=False),
             only_fully_replicated=dict(type='bool', default=False),
             only_not_replicated=dict(type='bool', default=False),
             lag_time_lowest=dict(type='float', required=False),

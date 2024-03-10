@@ -5,9 +5,9 @@
   register: log_files
 
 - name: Check if log files exist
-  ansible.builtin.fail:
-    msg: "No log files found in {{ ds389_repl_monitoring_log_dir }}"
-  when: log_files.files | length == 0
+  ansible.builtin.assert:
+    that: log_files.files | length > 0
+    fail_msg: "No log files found in {{ ds389_repl_monitoring_log_dir }}"
 
 - name: Analyze replication logs and write to file for each log file
   ds389_log_parser:

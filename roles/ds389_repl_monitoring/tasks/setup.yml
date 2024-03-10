@@ -3,6 +3,7 @@
     - name: Test connectivity to all hosts
       ansible.builtin.ping:
     - name: Ensure necessary packages are installed on the controller
+      become: true
       ansible.builtin.package:
         name: "{{ item }}"
         state: present
@@ -17,4 +18,4 @@
       ansible.builtin.file:
         path: "{{ ds389_repl_monitoring_log_dir }}"
         state: directory
-        mode: '0755'
+        mode: '0750'
