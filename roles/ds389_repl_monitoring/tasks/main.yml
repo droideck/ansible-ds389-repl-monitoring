@@ -7,3 +7,6 @@
 
 - name: Log instances of replication lag
   ansible.builtin.include_tasks: log_replication_lag.yml
+
+- name: Cleanup the environment after the ds389_repl_monitoring role
+  ansible.builtin.include_tasks: cleanup.yml

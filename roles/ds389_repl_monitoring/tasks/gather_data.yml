@@ -24,12 +24,17 @@
     dest: "{{ ds389_repl_monitoring_tmp_analysis_output_file_path }}"
     flat: true
 
-- name: Gather all analysis output file paths
-  ansible.builtin.set_fact:
-    analysis_output_files: "{{ groups['all'] | map('extract', hostvars, 'ds389_repl_monitoring_tmp_path')
-                 | zip(groups['all']) | map('join', '/')
-                 | map('regex_replace', '$', '_analysis_output.json')
-                 | list }}"
+- name: Find analysis output files
+  ansible.builtin.find:
+    paths: "{{ ds389_repl_monitoring_tmp_path }}"
+    patterns: "*_analysis_output.json"
+  register: found_files
+  delegate_to: localhost
+  run_once: true
+
+- name: Set fact for analysis output files paths
+  set_fact:
+    analysis_output_files: "{{ found_files.files | map(attribute='path') | list }}"
 
 - name: Merge analysis outputs on the controller
   ds389_merge_logs:
