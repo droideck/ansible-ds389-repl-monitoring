@@ -8,7 +8,7 @@ The Ansible 389 DS Replication Monitoring Project is designed to facilitate the 
 
 - Ansible 2.9 or later
 - Python 3.6 or later
-- 389 Directory Server instances
+- Access 389 Directory Server's access log files with appropriate read permissions
 
 ## Installation
 
@@ -23,12 +23,24 @@ The Ansible 389 DS Replication Monitoring Project is designed to facilitate the 
 
 ## Usage
 
-### Setting Up the Environment
+### Inventory Example
 
-Run the `setup-environment.yml` playbook to prepare your environment. This playbook ensures necessary packages are installed, sets up the log directory, and tests connectivity to all hosts.
+Consider using SSH for communication between the controller node and the instances - https://docs.ansible.com/ansible/latest/inventory_guide/connection_details.html#setting-up-ssh-keys
 
-```bash
-ansible-playbook playbooks/setup-environment.yml -i inventory/your_inventory.yml
+```yaml
+all:
+  children:
+    production:
+      vars:
+        ds389_repl_monitoring_lag_threshold: 20
+        ds389_repl_monitoring_result_dir: '/var/log/ds389_repl_monitoring'
+      hosts:
+        ds389_instance_1:
+          ansible_host: 192.168.2.101
+          ds389_repl_monitoring_log_dir: '/var/log/dirsrv/slapd-supplier1'
+        ds389_instance_2:  
+          ansible_host: 192.168.2.102
+          ds389_repl_monitoring_log_dir: '/var/log/dirsrv/slapd-supplier2'
 ```
 
 ### Monitoring Replication
@@ -48,53 +60,19 @@ The ds389_repl_monitoring role is an integral part of the Ansible 389 DS Replica
 
 The following variables can be configured for the `ds389_repl_monitoring` role:
 
-#### ds389_repl_monitoring_lag_threshold
-- Description: Threshold for replication lag monitoring (in seconds). If the replication lag exceeds this value, it will be considered as a lag event.
-- Default value: 10
 
-#### ds389_repl_monitoring_result_dir
-- Description: Directory to store replication monitoring results. The generated CSV and PNG files will be saved in this directory.
-- Default value: '/tmp'
-
-#### ds389_repl_monitoring_only_fully_replicated
-- Description: Filter to show only changes replicated on all replicas. If set to true, only changes that have been replicated to all replicas will be considered.
-- Default value: false
-
-#### ds389_repl_monitoring_only_not_replicated
-- Description: Filter to show only changes not replicated on all replicas. If set to true, only changes that have not been replicated to all replicas will be considered.
-- Default value: false
-
-#### ds389_repl_monitoring_lag_time_lowest
-- Description: Filter to show only changes with lag time greater than or equal to the specified value (in seconds). Changes with a lag time lower than this value will be excluded from the monitoring results.
-- Default value: 0
-
-#### ds389_repl_monitoring_etime_lowest
-- Description: Filter to show only changes with execution time (etime) greater than or equal to the specified value (in seconds). Changes with an execution time lower than this value will be excluded from the monitoring results.
-- Default value: 0
-
-#### ds389_repl_monitoring_utc_offset
-- Description: UTC offset in seconds for timezone adjustment. This value will be used to adjust the log timestamps to the desired timezone.
-- Default value: 0
-
-#### ds389_repl_monitoring_tmp_path
-- Description: Temporary directory path for storing intermediate files. This directory will be used to store temporary files generated during the monitoring process.
-- Default value: "/tmp"
-
-#### ds389_repl_monitoring_tmp_analysis_output_file_path
-- Description: Path to the temporary analysis output file for each host. This file will contain the parsed replication data for each individual host.
-- Default value: "{{ ds389_repl_monitoring_tmp_path }}/{{ inventory_hostname }}_analysis_output.json"
-
-#### ds389_repl_monitoring_tmp_merged_output_file_path
-- Description: Path to the temporary merged output file. This file will contain the merged replication data from all hosts.
-- Default value: "{{ ds389_repl_monitoring_tmp_path }}/merged_output.json"
+| Variable | Default | Description |
+|----------|---------|-------------|
+| ds389_repl_monitoring_lag_threshold | 10 | Threshold for replication lag monitoring (in seconds). A line will be drawn in the plot to indicate the threshold value. |
+| ds389_repl_monitoring_result_dir | '/tmp' | Directory to store replication monitoring results. The generated CSV and PNG files will be saved in this directory in a directory named after the execution time. |
+| ds389_repl_monitoring_only_fully_replicated | false | Filter to show only changes replicated on all replicas. If set to true, only changes that have been replicated to all replicas will be considered. |
+| ds389_repl_monitoring_only_not_replicated | false | Filter to show only changes not replicated on all replicas. If set to true, only changes that have not been replicated to all replicas will be considered. |
+| ds389_repl_monitoring_lag_time_lowest | 0 | Filter to show only changes with lag time greater than or equal to the specified value (in seconds). Changes with a lag time lower than this value will be excluded from the monitoring results. |
+| ds389_repl_monitoring_etime_lowest | 0 | Filter to show only changes with execution time (etime) greater than or equal to the specified value (in seconds). Changes with an execution time lower than this value will be excluded from the monitoring results. |
+| ds389_repl_monitoring_utc_offset | 0 | UTC offset in seconds for timezone adjustment. This value will be used to adjust the log timestamps to the desired timezone. |
+| ds389_repl_monitoring_tmp_path | "/tmp" | Temporary directory path for storing intermediate files. This directory will be used to store temporary files generated during the monitoring process. |
 
 These variables can be overridden in the playbook or inventory to customize the behavior of the ds389_repl_monitoring role according to your specific requirements.
-
-### Inventory Requirements
-This role is designed to work with a dynamic inventory that includes all hosts participating in the 389 DS topology.
-
-### Dependencies
-- Python-matplotlib (for generating PNG graphs)
 
 ### Example Playbook
 ```yaml
@@ -135,8 +113,19 @@ The project is configured with Ansible Molecule for testing using Docker. To run
   Continued development of documentation for setup, configuration, and usage.
 
 ## Additional Notes
-- Ensure that Python3 and Python-matplotlib are installed on all target hosts for the successful execution of this role.
 - The role assumes that access logs are present in the `ds389_repl_monitoring_log_dir`.
 - The role should be run not more often than once per hour as per current logic.
 
-Notable mentions: Thank you, Pierre Rogier (@progier389) for dslogs and dslogsplot tools!
+
+## License
+
+This role is licensed under the GPL-3.0-or-later license.
+
+## Author
+
+This role was created by Simon Pichugin (@droideck).
+
+
+## Notable mentions
+
+Thank you, Pierre Rogier (@progier389) for dslogs and dslogsplot tools!
