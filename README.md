@@ -4,6 +4,12 @@
 
 The Ansible 389 DS Replication Monitoring Project is designed to facilitate the monitoring and logging of replication lag on 389 DS agreements across an entire topology. Utilizing CSN and etime values, the project offers capabilities to detect and log instances where replication is lagging behind a pre-defined threshold. The data is gathered and stored in the user-defined directory in CSV and PNG graph formats.
 
+## Important Warning!
+
+Ansible 389 DS Replication Monitoring tool should not be used in production or for any performance evaluation as of now. It is in an alpha version and should be used only for testing the tool itsleft as it requires tuning and usability/bug fixes.
+
+Also, the tool has not been fully tested for possible security issues, AND its reports are not accurate enough.
+
 ## Requirements
 
 - Ansible 2.9 or later
