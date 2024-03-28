@@ -9,6 +9,18 @@
     that: log_files.files | length > 0
     fail_msg: "No log files found in {{ ds389_repl_monitoring_log_dir }}"
 
+- name: Check log file permissions
+  ansible.builtin.stat:
+    path: "{{ item.path }}"
+  register: log_file_stats
+  loop: "{{ log_files.files }}"
+
+- name: Assert log files have expected permissions (can be read)
+  ansible.builtin.assert:
+    that: log_file_stats.results | map(attribute='stat.mode') | map('regex_search', '^[^0-9]*[4-7][^0-9]*[0-7][0-7][0-7]$') | list
+    fail_msg: "Log files in {{ ds389_repl_monitoring_log_dir }} are not readable"
+  loop: "{{ log_files.files }}"
+
 - name: Analyze replication logs and write to file for each log file
   ds389_log_parser:
     logfiles: "{{ log_files.files | map(attribute='path') | list }}"
