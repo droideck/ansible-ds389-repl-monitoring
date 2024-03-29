@@ -5,7 +5,7 @@
   delegate_to: localhost
   run_once: true
 
-- name: Cleanup analysis output files on remote machines
+- name: Gather analysis output files on remote machines
   ansible.builtin.find:
     paths: "{{ ds389_repl_monitoring_tmp_path }}"
     patterns: "*_analysis_output.json"
@@ -17,11 +17,7 @@
     state: absent
   loop: "{{ files_to_remove.files }}"
 
-- name: Debug file list
-  ansible.builtin.debug:
-    msg: "{{ files_to_remove.files }}"
-
-- name: Remove temporary files on the controller
+- name: Remove found analysis output files on controller
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: absent

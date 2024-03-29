@@ -47,6 +47,7 @@
 - name: Set fact for analysis output files paths
   set_fact:
     analysis_output_files: "{{ found_files.files | map(attribute='path') | list }}"
+    run_once: true
 
 - name: Merge analysis outputs on the controller
   ds389_merge_logs:

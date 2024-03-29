@@ -1,3 +1,9 @@
+- name: Check if there's any data to process
+  ansible.builtin.assert:
+    that: ds389_repl_monitoring_tmp_merged_output_file_path is defined
+    fail_msg: "No data to process"
+  run_once: true
+
 - name: Create a directory with current date
   ansible.builtin.file:
     path: "{{ ds389_repl_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}"
@@ -26,4 +32,4 @@
     repl_lag_threshold: "{{ ds389_repl_monitoring_lag_threshold }}"
   delegate_to: localhost
   run_once: true
-  when: not replication_lag_files.stat.exists
+  when: not replication_lag_files.stat.exists or ds389_repl_monitoring_force_replace_existing

@@ -74,7 +74,7 @@ def merge_jsons(json_list):
         for key, value in json_data["lag"].items():
             if key not in merged_json["lag"]:
                 merged_json["lag"][key] = {}
-            for inner_key, inner_value in value.items():
+            for _, inner_value in value.items():
                 merged_json["lag"][key][str(idx)] = inner_value
 
     return merged_json

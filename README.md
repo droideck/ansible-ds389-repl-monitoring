@@ -1,4 +1,4 @@
-# Ansible 389 Director Server Replication Monitoring Project
+# Ansible 389 Directory Server Replication Monitoring Project
 
 ## Overview
 

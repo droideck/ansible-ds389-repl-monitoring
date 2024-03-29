@@ -38,3 +38,7 @@ ds389_repl_monitoring_tmp_analysis_output_file_path: "{{ ds389_repl_monitoring_t
 # Path to the temporary merged output file
 # This file will contain the merged replication data from all hosts
 ds389_repl_monitoring_tmp_merged_output_file_path: "{{ ds389_repl_monitoring_tmp_path }}/merged_output.json"
+
+# Force generation of plots even if replication lag files already exist for the current hour
+# Use this only for tuning the plot generation parameters. The production use case should have this set to false
+ds389_repl_monitoring_force_replace_existing: false

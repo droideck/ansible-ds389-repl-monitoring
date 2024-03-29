@@ -238,7 +238,10 @@ def main():
         with open(input_path, "r", encoding="utf-8") as fd:
             lag_info = LagInfo(module.params)
             lag_info.json_parse(fd)
-            lag_info.plot_lag_image(module)
+            try:
+                lag_info.plot_lag_image(module)
+            except IndexError:
+                module.fail_json(msg="There's no data to include in the report")
     except Exception as e:
         module.fail_json(msg=f"Failed to process file {input_path}: {e}")
 
