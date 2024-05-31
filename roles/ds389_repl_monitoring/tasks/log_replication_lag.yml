@@ -30,6 +30,8 @@
     etime_lowest: "{{ ds389_repl_monitoring_etime_lowest }}"
     utc_offset: "{{ ds389_repl_monitoring_utc_offset }}"
     repl_lag_threshold: "{{ ds389_repl_monitoring_lag_threshold }}"
+    start_time: "{{ ds389_repl_monitoring_start_time }}"
+    end_time: "{{ ds389_repl_monitoring_end_time }}"
   delegate_to: localhost
   run_once: true
   when: not replication_lag_files.stat.exists or ds389_repl_monitoring_force_replace_existing

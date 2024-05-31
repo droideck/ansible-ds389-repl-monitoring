@@ -64,6 +64,16 @@ options:
             - A horizontal line will be drawn in the plot to represent this threshold.
         required: false
         type: float
+    start_time:
+        description:
+            - Start time for the time range filter in 'YYYY-MM-DD HH:MM:SS' format.
+        required: false
+        type: str
+    end_time:
+        description:
+            - End time for the time range filter in 'YYYY-MM-DD HH:MM:SS' format.
+        required: false
+        type: str
 author:
     - Simon Pichugin (@droideck)
 '''
@@ -78,6 +88,8 @@ EXAMPLES = '''
     lag_time_lowest: 10
     utc_offset: -3600
     repl_lag_threshold: 5
+    start_time: "2024-01-01 00:00:00"
+    end_time: "2024-01-02 00:00:00"
 
 - name: Generate 389 DS log data CSV with minimap etime and only not replicated changes
   dslogs_plot:
@@ -135,11 +147,19 @@ class LagInfo:
         self.lag = []
         self.index_list = []
         self._setup_timezone()
+        self.start_time = self._parse_time(module_params.get('start_time', '1970-01-01 00:00:00'))
+        self.end_time = self._parse_time(module_params.get('end_time', '9999-12-31 23:59:59'))
 
     def _setup_timezone(self):
         if self.module_params['utc_offset'] is not None:
             tz_delta = datetime.timedelta(seconds=self.module_params['utc_offset'])
             self.tz = datetime.timezone(tz_delta)
+
+    def _parse_time(self, time_str):
+        try:
+            return datetime.datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S').replace(tzinfo=self.tz)
+        except ValueError:
+            raise ValueError(f"Time format should be 'YYYY-MM-DD HH:MM:SS', but got '{time_str}'")
 
     def date_from_udt(self, udt):
         try:
@@ -155,6 +175,10 @@ class LagInfo:
         if self.module_params['lag_time_lowest'] and csninfo.lag_time[0] <= self.module_params['lag_time_lowest']:
             return True
         if self.module_params['etime_lowest'] and csninfo.etime[0] <= self.module_params['etime_lowest']:
+            return True
+        if self.start_time and self.date_from_udt(csninfo.oldest_time[0]) < self.start_time:
+            return True
+        if self.end_time and self.date_from_udt(csninfo.oldest_time[0]) > self.end_time:
             return True
         return False
 
@@ -192,27 +216,26 @@ class LagInfo:
             except Exception as e:
                 module.fail_json(msg=f"Failed to write CSV file {self.module_params['csv_output_path']}: {e}")
 
-        plt.plot(xdata, ydata, label='lag')
-        plt.plot(xdata, edata, label='etime')
+        plt.figure(figsize=(15, 7))  # Set the figure size to be wide
+        plt.plot(xdata, ydata, label='Replication Lag', color='blue', linestyle='-', linewidth=1.5, marker='o')
+        plt.plot(xdata, edata, label='Elapsed Time', color='green', linestyle='-', linewidth=1.5, marker='x')
 
-        if self.module_params['repl_lag_threshold'] is not None:
-            plt.axhline(y=self.module_params['repl_lag_threshold'], color='r', linestyle='-', label='Replication Lag Threshold')
+        if self.module_params['repl_lag_threshold'] != 0:
+            plt.axhline(y=self.module_params['repl_lag_threshold'], color='red', linestyle='-', label='Replication Lag Threshold')
 
-        plt.title('Replication lag time')
-        plt.ylabel('time (s)')
-        plt.xlabel(f'log time (starting on {starting_time})')
-        plt.legend()
-
-        if self.module_params['csv_output_path']:
-            message = f"CSV data saved to {self.module_params['csv_output_path']}"
-        else:
-            module.fail_json(msg=f"CSV path (csv_output_path:) is requred")
+        plt.title('Replication Lag Time', fontsize=16)
+        plt.ylabel('Time (s)', fontsize=14)
+        plt.xlabel(f'Log Time (starting on {starting_time})', fontsize=14)
+        plt.xticks(rotation=45)
+        plt.legend(loc='upper right', fontsize=12)
+        plt.grid(True)
+        plt.tight_layout()
 
         if self.module_params['png_output_path']:
             plt.savefig(self.module_params['png_output_path'])
-            message += f" And plot saved to {self.module_params['png_output_path']}"
-        module.exit_json(changed=True, message=message)
-
+            module.exit_json(changed=True, message=f"CSV data saved to {self.module_params['csv_output_path']}. Plot saved to {self.module_params['png_output_path']}")
+        else:
+            module.fail_json(msg="PNG output path (png_output_path) is required")
 
 def main():
     module = AnsibleModule(
@@ -225,7 +248,9 @@ def main():
             lag_time_lowest=dict(type='float', required=False),
             etime_lowest=dict(type='float', required=False),
             utc_offset=dict(type='int', required=False),
-            repl_lag_threshold=dict(type='float', required=False)
+            repl_lag_threshold=dict(type='float', required=False),
+            start_time=dict(type='str', required=False, default='1970-01-01 00:00:00'),
+            end_time=dict(type='str', required=False, default='9999-12-31 23:59:59')
         ),
         supports_check_mode=True
     )

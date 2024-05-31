@@ -69,13 +69,15 @@ The following variables can be configured for the `ds389_repl_monitoring` role:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| ds389_repl_monitoring_lag_threshold | 10 | Threshold for replication lag monitoring (in seconds). A line will be drawn in the plot to indicate the threshold value. |
+| ds389_repl_monitoring_lag_threshold | 0 | Threshold for replication lag monitoring (in seconds). A line will be drawn in the plot to indicate the threshold value. |
 | ds389_repl_monitoring_result_dir | '/tmp' | Directory to store replication monitoring results. The generated CSV and PNG files will be saved in this directory in a directory named after the execution time. |
 | ds389_repl_monitoring_only_fully_replicated | false | Filter to show only changes replicated on all replicas. If set to true, only changes that have been replicated to all replicas will be considered. |
 | ds389_repl_monitoring_only_not_replicated | false | Filter to show only changes not replicated on all replicas. If set to true, only changes that have not been replicated to all replicas will be considered. |
 | ds389_repl_monitoring_lag_time_lowest | 0 | Filter to show only changes with lag time greater than or equal to the specified value (in seconds). Changes with a lag time lower than this value will be excluded from the monitoring results. |
 | ds389_repl_monitoring_etime_lowest | 0 | Filter to show only changes with execution time (etime) greater than or equal to the specified value (in seconds). Changes with an execution time lower than this value will be excluded from the monitoring results. |
 | ds389_repl_monitoring_utc_offset | 0 | UTC offset in seconds for timezone adjustment. This value will be used to adjust the log timestamps to the desired timezone. |
+| ds389_repl_monitoring_start_time | '1970-01-01 00:00:00' | Start time for the time range filter in 'YYYY-MM-DD HH:MM:SS' format |
+| ds389_repl_monitoring_end_time | '9999-12-31 23:59:59' | End time for the time range filter in 'YYYY-MM-DD HH:MM:SS' format |
 | ds389_repl_monitoring_tmp_path | "/tmp" | Temporary directory path for storing intermediate files. This directory will be used to store temporary files generated during the monitoring process. |
 
 These variables can be overridden in the playbook or inventory to customize the behavior of the ds389_repl_monitoring role according to your specific requirements.

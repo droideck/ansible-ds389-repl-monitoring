@@ -1,7 +1,7 @@
 ---
 # Threshold for replication lag monitoring (in seconds)
 # It will draw a line in the plot to indicate the threshold value
-ds389_repl_monitoring_lag_threshold: 10
+ds389_repl_monitoring_lag_threshold: 0
 
 # Directory to store replication monitoring results
 # The generated CSV and PNG files will be saved in this directory
@@ -30,6 +30,12 @@ ds389_repl_monitoring_utc_offset: 0
 # Temporary directory path for storing intermediate files
 # This directory will be used to store temporary files generated during the monitoring process
 ds389_repl_monitoring_tmp_path: "/tmp"
+
+# Start time for the time range filter in 'YYYY-MM-DD HH:MM:SS' format
+ds389_repl_monitoring_start_time: "1970-01-01 00:00:00"
+
+# End time for the time range filter in 'YYYY-MM-DD HH:MM:SS' format
+ds389_repl_monitoring_end_time: "9999-12-31 23:59:59"
 
 # Path to the temporary analysis output file for each host
 # This file will contain the parsed replication data for each individual host
