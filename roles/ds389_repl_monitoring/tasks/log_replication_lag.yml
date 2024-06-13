@@ -24,6 +24,7 @@
     input: "{{ ds389_repl_monitoring_tmp_merged_output_file_path }}"
     csv_output_path: "{{ ds389_repl_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.csv"
     png_output_path: "{{ ds389_repl_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.png"
+    html_output_path: "{{ ds389_repl_monitoring_result_dir }}/{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}/replication_lag.html"
     only_fully_replicated: "{{ ds389_repl_monitoring_only_fully_replicated }}"
     only_not_replicated: "{{ ds389_repl_monitoring_only_not_replicated }}"
     lag_time_lowest: "{{ ds389_repl_monitoring_lag_time_lowest }}"

@@ -104,6 +104,8 @@ import datetime
 import json
 import matplotlib.pyplot as plt
 import os
+import plotly.graph_objs as go
+import plotly.io as pio
 
 class CsnInfo:
     def __init__(self, csn):
@@ -128,7 +130,8 @@ class CsnInfo:
             self.etime = [etime, idx]
 
     def resolve(self):
-        self.lag_time[0] -= self.oldest_time[0]
+        if self.oldest_time is not None and self.lag_time is not None:
+            self.lag_time[0] -= self.oldest_time[0]
 
     def _to_dict(self):
         return {
@@ -199,6 +202,9 @@ class LagInfo:
                 self.lag.append(info)
 
     def plot_lag_image(self, module):
+        if not self.lag:
+            module.fail_json(msg="No data available to plot.")
+
         self.lag.sort(key=lambda csninfo: csninfo.oldest_time[0])
         starting_time = self.date_from_udt(self.lag[0].oldest_time[0])
 
@@ -209,10 +215,10 @@ class LagInfo:
         if self.module_params['csv_output_path']:
             try:
                 with open(self.module_params['csv_output_path'], "w", encoding="utf-8") as csv_file:
-                    csv_file.write("timestamp,lag,etime\n")
+                    csv_file.write("timestamp,lag,etime,csn\n")
                     for idx in range(len(xdata)):
                         timestamp = xdata[idx].strftime('%Y-%m-%d %H:%M:%S') if xdata[idx] != "?" else "?"
-                        csv_file.write(f"{timestamp},{ydata[idx]},{edata[idx]}\n")
+                        csv_file.write(f"{timestamp},{ydata[idx]},{edata[idx]},{self.lag[idx].csn}\n")
             except Exception as e:
                 module.fail_json(msg=f"Failed to write CSV file {self.module_params['csv_output_path']}: {e}")
 
@@ -237,12 +243,99 @@ class LagInfo:
         else:
             module.fail_json(msg="PNG output path (png_output_path) is required")
 
+
+    def plot_interactive_html(self, module):
+        if not self.lag:
+            module.fail_json(msg="No data available to plot.")
+
+        self.lag.sort(key=lambda csninfo: csninfo.oldest_time[0])
+        starting_time = self.date_from_udt(self.lag[0].oldest_time[0])
+
+        xdata = [self.date_from_udt(i.oldest_time[0]) for i in self.lag]
+        ydata = [i.lag_time[0] for i in self.lag]
+        edata = [i.etime[0] for i in self.lag]
+        csn_hover_text = [f"CSN: {i.csn}" for i in self.lag]
+
+        trace1 = go.Scatter(x=xdata, y=ydata, mode='lines+markers', name='Replication Lag', text=csn_hover_text, hoverinfo='text+x+y')
+        trace2 = go.Scatter(x=xdata, y=edata, mode='lines+markers', name='Elapsed Time', text=csn_hover_text, hoverinfo='text+x+y')
+
+        layout = go.Layout(
+            title='Replication Lag Time',
+            xaxis=dict(title=f'Log Time (starting on {starting_time})'),
+            yaxis=dict(title='Time (s)'),
+            hovermode='closest',
+            shapes=[{
+                'type': 'line',
+                'x0': xdata[0],
+                'x1': xdata[-1],
+                'y0': self.module_params['repl_lag_threshold'],
+                'y1': self.module_params['repl_lag_threshold'],
+                'line': {
+                    'color': 'red',
+                    'width': 2,
+                    'dash': 'dash',
+                },
+                'name': 'Replication Lag Threshold'
+            }] if self.module_params['repl_lag_threshold'] != 0 else [],
+            margin=dict(l=40, r=30, b=80, t=100),
+            annotations=[
+                dict(
+                    x=0.5,
+                    y=-0.15,
+                    showarrow=False,
+                    text="Click on a point to copy the CSN to clipboard",
+                    xref="paper",
+                    yref="paper",
+                    xanchor="center",
+                    yanchor="auto",
+                    font=dict(size=12)
+                )
+            ]
+        )
+
+        fig = go.Figure(data=[trace1, trace2], layout=layout)
+
+        html_content = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
+        custom_js = """
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var plot = document.getElementsByClassName('plotly-graph-div')[0];
+            plot.on('plotly_click', function(data) {
+                var infotext = data.points.map(function(d) {
+                    return d.text;
+                });
+                var csn = infotext[0].replace('CSN: ', '');
+                navigator.clipboard.writeText(csn).then(function() {
+                    alert('CSN ' + csn + ' copied to clipboard');
+                }, function(err) {
+                    console.error('Could not copy text: ', err);
+                });
+            });
+        });
+        </script>
+        """
+
+        full_html = f"<!DOCTYPE html><html><head><title>Replication Lag Time</title></head><body><div id='plotly-div'>{html_content}</div>{custom_js}</body></html>"
+
+        if self.module_params['html_output_path']:
+            try:
+                with open(self.module_params['html_output_path'], 'w', encoding='utf-8') as f:
+                    f.write(full_html)
+                module.exit_json(changed=True, message=f"CSV data saved to {self.module_params['csv_output_path']}. Interactive plot saved to {self.module_params['html_output_path']}")
+            except Exception as e:
+                module.fail_json(msg=f"Failed to write HTML file {self.module_params['html_output_path']}: {e}")
+        else:
+            module.fail_json(msg="HTML output path (html_output_path) is required")
+
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             input=dict(type='str', required=True),
             csv_output_path=dict(type='str', required=False),
             png_output_path=dict(type='str', required=False),
+            html_output_path=dict(type='str', required=False),
             only_fully_replicated=dict(type='bool', default=False),
             only_not_replicated=dict(type='bool', default=False),
             lag_time_lowest=dict(type='float', required=False),
@@ -264,7 +357,10 @@ def main():
             lag_info = LagInfo(module.params)
             lag_info.json_parse(fd)
             try:
-                lag_info.plot_lag_image(module)
+                if module.params['html_output_path']:
+                    lag_info.plot_interactive_html(module)
+                else:
+                    lag_info.plot_lag_image(module)
             except IndexError:
                 module.fail_json(msg="There's no data to include in the report")
     except Exception as e:
