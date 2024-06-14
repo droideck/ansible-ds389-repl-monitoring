@@ -108,8 +108,9 @@ import plotly.graph_objs as go
 import plotly.io as pio
 
 class CsnInfo:
-    def __init__(self, csn):
+    def __init__(self, csn, tz):
         self.csn = csn
+        self.tz = tz
         self.oldest_time = None
         self.lag_time = None
         self.etime = None
@@ -141,6 +142,17 @@ class CsnInfo:
             'replicated_on': self.replicated_on
         }
 
+    def describe_csn(self):
+        try:
+            timestamp_hex = self.csn[:8]
+            timestamp = datetime.datetime.utcfromtimestamp(int(timestamp_hex, 16)).astimezone(self.tz).strftime('%Y-%m-%d %H:%M:%S')
+            sequence_number = int(self.csn[8:12], 16)
+            identifier = int(self.csn[12:16], 16)
+            sub_sequence_number = int(self.csn[16:20], 16)
+            return f"{timestamp} | Sequence: {sequence_number} | ID: {identifier} | Sub-sequence: {sub_sequence_number}"
+        except Exception as e:
+            return f"Failed to describe CSN: {e}"
+
 class LagInfo:
     def __init__(self, module_params):
         self.module_params = module_params
@@ -157,6 +169,8 @@ class LagInfo:
         if self.module_params['utc_offset'] is not None:
             tz_delta = datetime.timedelta(seconds=self.module_params['utc_offset'])
             self.tz = datetime.timezone(tz_delta)
+        else:
+            self.tz = datetime.timezone.utc
 
     def _parse_time(self, time_str):
         try:
@@ -192,7 +206,7 @@ class LagInfo:
         self.index_list = list(range(len(self.log_files)))
         self._setup_timezone()
         for csn, csninfo in json_dict['lag'].items():
-            info = CsnInfo(csn)
+            info = CsnInfo(csn, self.tz)
             for idx, record in csninfo.items():
                 idx = int(idx)
                 if idx in self.index_list:
@@ -215,10 +229,11 @@ class LagInfo:
         if self.module_params['csv_output_path']:
             try:
                 with open(self.module_params['csv_output_path'], "w", encoding="utf-8") as csv_file:
-                    csv_file.write("timestamp,lag,etime,csn\n")
+                    csv_file.write("timestamp,lag,etime,csn,described_csn\n")
                     for idx in range(len(xdata)):
                         timestamp = xdata[idx].strftime('%Y-%m-%d %H:%M:%S') if xdata[idx] != "?" else "?"
-                        csv_file.write(f"{timestamp},{ydata[idx]},{edata[idx]},{self.lag[idx].csn}\n")
+                        described_csn = self.lag[idx].describe_csn()
+                        csv_file.write(f"{timestamp},{ydata[idx]},{edata[idx]},{self.lag[idx].csn},{described_csn}\n")
             except Exception as e:
                 module.fail_json(msg=f"Failed to write CSV file {self.module_params['csv_output_path']}: {e}")
 
@@ -254,7 +269,7 @@ class LagInfo:
         xdata = [self.date_from_udt(i.oldest_time[0]) for i in self.lag]
         ydata = [i.lag_time[0] for i in self.lag]
         edata = [i.etime[0] for i in self.lag]
-        csn_hover_text = [f"CSN: {i.csn}" for i in self.lag]
+        csn_hover_text = [f"CSN: {i.csn}<br>Described: {i.describe_csn()}<br>Time: {xdata[idx].strftime('%Y-%m-%d %H:%M:%S')}" for idx, i in enumerate(self.lag)]
 
         trace1 = go.Scatter(x=xdata, y=ydata, mode='lines+markers', name='Replication Lag', text=csn_hover_text, hoverinfo='text+x+y')
         trace2 = go.Scatter(x=xdata, y=edata, mode='lines+markers', name='Elapsed Time', text=csn_hover_text, hoverinfo='text+x+y')
@@ -304,7 +319,7 @@ class LagInfo:
                 var infotext = data.points.map(function(d) {
                     return d.text;
                 });
-                var csn = infotext[0].replace('CSN: ', '');
+                var csn = infotext[0].replace('CSN: ', '').split('<br>')[0];
                 navigator.clipboard.writeText(csn).then(function() {
                     alert('CSN ' + csn + ' copied to clipboard');
                 }, function(err) {
@@ -326,7 +341,6 @@ class LagInfo:
                 module.fail_json(msg=f"Failed to write HTML file {self.module_params['html_output_path']}: {e}")
         else:
             module.fail_json(msg="HTML output path (html_output_path) is required")
-
 
 
 def main():
