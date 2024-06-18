@@ -51,11 +51,9 @@ import re
 import json
 import logging
 
-
-
 class DSLogParser:
     REGEX_TIMESTAMP = re.compile(
-        r'\[(?P<day>\d*)\/(?P<month>\w*)\/(?P<year>\d*):(?P<hour>\d*):(?P<minute>\d*):(?P<second>\d*)(\.(?P<nanosecond>\d*))+\s(?P<tz>[\+\-]\d*)'
+        r'\[(?P<day>\d*)\/(?P<month>\w*)\/(?P<year>\d*):(?P<hour>\d*):(?P<minute>\d*):(?P<second>\d*)(\.(?P<nanosecond>\d*))+\s(?P<tz>[\+\-]\d{2})(?P<tz_minute>\d{2})'
     )
     REGEX_LINE = re.compile(
         r'\s(?P<quoted>[^= ]+="[^"]*")|(?P<var>[^= ]+=[^\s]+)|(?P<keyword>[^\s]+)'
@@ -88,7 +86,7 @@ class DSLogParser:
         iso_ts = '{YEAR}-{MONTH}-{DAY}T{HOUR}:{MINUTE}:{SECOND}{TZH}:{TZM}'.format(
             YEAR=timedata['year'], MONTH=self.MONTH_LOOKUP[timedata['month']],
             DAY=timedata['day'], HOUR=timedata['hour'], MINUTE=timedata['minute'],
-            SECOND=timedata['second'], TZH=timedata['tz'][0:3], TZM=timedata['tz'][3:5]
+            SECOND=timedata['second'], TZH=timedata['tz'], TZM=timedata['tz_minute']
         )
         dt = datetime.datetime.fromisoformat(iso_ts)
         if timedata['nanosecond']:

@@ -23,12 +23,18 @@ options:
         description:
             - Path where the CSV file should be generated.
             - If not specified, no CSV file will be created.
-        required: true
+        required: false
         type: str
     png_output_path:
         description:
             - Path where the plot image should be saved.
-            - If not specified, the plot will be saved to a temporary file and its path returned.
+            - If not specified, no PNG file will be created.
+        required: false
+        type: str
+    html_output_path:
+        description:
+            - Path where the interactive plot HTML file should be saved.
+            - If not specified, no HTML file will be created.
         required: false
         type: str
     only_fully_replicated:
@@ -84,6 +90,7 @@ EXAMPLES = '''
     input: "/path/to/log_data.json"
     csv_output_path: "/path/to/output_data.csv"
     png_output_path: "/path/to/plot.png"
+    html_output_path: "/path/to/interactive_plot.html"
     only_fully_replicated: yes
     lag_time_lowest: 10
     utc_offset: -3600
@@ -145,7 +152,7 @@ class CsnInfo:
     def describe_csn(self):
         try:
             timestamp_hex = self.csn[:8]
-            timestamp = datetime.datetime.utcfromtimestamp(int(timestamp_hex, 16)).astimezone(self.tz).strftime('%Y-%m-%d %H:%M:%S')
+            timestamp = datetime.datetime.fromtimestamp(int(timestamp_hex, 16), tz=self.tz).strftime('%Y-%m-%d %H:%M:%S')
             sequence_number = int(self.csn[8:12], 16)
             identifier = int(self.csn[12:16], 16)
             sub_sequence_number = int(self.csn[16:20], 16)
@@ -215,7 +222,23 @@ class LagInfo:
             if not self.is_filtered(info):
                 self.lag.append(info)
 
-    def plot_lag_image(self, module):
+    def plot_lag_csv(self, module):
+        if not self.lag:
+            module.fail_json(msg="No data available to plot.")
+
+        self.lag.sort(key=lambda csninfo: csninfo.oldest_time[0])
+
+        with open(self.module_params['csv_output_path'], "w", encoding="utf-8") as csv_file:
+            csv_file.write("timestamp,lag,etime,csn,described_csn\n")
+            for idx in range(len(self.lag)):
+                csninfo = self.lag[idx]
+                timestamp = self.date_from_udt(csninfo.oldest_time[0]).strftime('%Y-%m-%d %H:%M:%S')
+                described_csn = csninfo.describe_csn()
+                csv_file.write(f"{timestamp},{csninfo.lag_time[0]},{csninfo.etime[0]},{csninfo.csn},{described_csn}\n")
+
+        module.log("CSV plot generated successfully")
+
+    def plot_lag_png(self, module):
         if not self.lag:
             module.fail_json(msg="No data available to plot.")
 
@@ -225,17 +248,6 @@ class LagInfo:
         xdata = [self.date_from_udt(i.oldest_time[0]) for i in self.lag]
         ydata = [i.lag_time[0] for i in self.lag]
         edata = [i.etime[0] for i in self.lag]
-
-        if self.module_params['csv_output_path']:
-            try:
-                with open(self.module_params['csv_output_path'], "w", encoding="utf-8") as csv_file:
-                    csv_file.write("timestamp,lag,etime,csn,described_csn\n")
-                    for idx in range(len(xdata)):
-                        timestamp = xdata[idx].strftime('%Y-%m-%d %H:%M:%S') if xdata[idx] != "?" else "?"
-                        described_csn = self.lag[idx].describe_csn()
-                        csv_file.write(f"{timestamp},{ydata[idx]},{edata[idx]},{self.lag[idx].csn},{described_csn}\n")
-            except Exception as e:
-                module.fail_json(msg=f"Failed to write CSV file {self.module_params['csv_output_path']}: {e}")
 
         plt.figure(figsize=(15, 7))  # Set the figure size to be wide
         plt.plot(xdata, ydata, label='Replication Lag', color='blue', linestyle='-', linewidth=1.5, marker='o')
@@ -252,12 +264,9 @@ class LagInfo:
         plt.grid(True)
         plt.tight_layout()
 
-        if self.module_params['png_output_path']:
-            plt.savefig(self.module_params['png_output_path'])
-            module.exit_json(changed=True, message=f"CSV data saved to {self.module_params['csv_output_path']}. Plot saved to {self.module_params['png_output_path']}")
-        else:
-            module.fail_json(msg="PNG output path (png_output_path) is required")
+        plt.savefig(self.module_params['png_output_path'])
 
+        module.log("PNG plot generated successfully")
 
     def plot_interactive_html(self, module):
         if not self.lag:
@@ -336,7 +345,7 @@ class LagInfo:
             try:
                 with open(self.module_params['html_output_path'], 'w', encoding='utf-8') as f:
                     f.write(full_html)
-                module.exit_json(changed=True, message=f"CSV data saved to {self.module_params['csv_output_path']}. Interactive plot saved to {self.module_params['html_output_path']}")
+                module.log("HTML plot generated successfully")
             except Exception as e:
                 module.fail_json(msg=f"Failed to write HTML file {self.module_params['html_output_path']}: {e}")
         else:
@@ -371,12 +380,20 @@ def main():
             lag_info = LagInfo(module.params)
             lag_info.json_parse(fd)
             try:
+                if module.params['csv_output_path']:
+                    module.log("Generating CSV plot")
+                    lag_info.plot_lag_csv(module)
+                if module.params['png_output_path']:
+                    module.log("Generating PNG plot")
+                    lag_info.plot_lag_png(module)
                 if module.params['html_output_path']:
+                    module.log("Generating HTML plot")
                     lag_info.plot_interactive_html(module)
-                else:
-                    lag_info.plot_lag_image(module)
+                if not module.params['csv_output_path'] and not module.params['html_output_path'] and not module.params['png_output_path']:
+                    module.fail_json(msg="No output path specified")
             except IndexError:
                 module.fail_json(msg="There's no data to include in the report")
+            module.exit_json(changed=True, message="Plot generated successfully")
     except Exception as e:
         module.fail_json(msg=f"Failed to process file {input_path}: {e}")
 
