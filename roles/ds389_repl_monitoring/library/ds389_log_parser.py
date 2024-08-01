@@ -134,6 +134,7 @@ class DSLogParser:
 
 class ReplLag:
     def __init__(self, args):
+        self.server_name = args['server_name']
         self.logfiles = args['logfiles']
         self.anonymous = args['anonymous']
         self.nbfiles = len(args['logfiles'])
@@ -142,10 +143,11 @@ class ReplLag:
         self.start_dt = None  
 
     class Parser(DSLogParser):
-        def __init__(self, idx, logfile, result):
+        def __init__(self, server_name, idx, logfile, result):
             super().__init__(logfile)
             self.result = result
             self.idx = idx
+            self.srv_name = server_name
 
         def action(self, r):
             try:
@@ -157,7 +159,7 @@ class ReplLag:
                     self.result.start_dt = dt
                 if csn not in self.result.csns:
                     self.result.csns[csn] = {}
-                record = {"logtime": udt, "etime": r.vars['etime']}
+                record = {"logtime": udt, "etime": r.vars['etime'], "server_name": self.srv_name}
                 self.result.csns[csn][self.idx] = record
             except KeyError:
                 pass
@@ -165,7 +167,7 @@ class ReplLag:
     def parse_files(self):
         """Parse all log files."""
         for idx, f in enumerate(self.logfiles):
-            parser = self.Parser(idx, f, self)
+            parser = self.Parser(self.server_name, idx, f, self)
             parser.parse_file()
 
     def build_result(self):
@@ -186,6 +188,7 @@ class ReplLag:
 def main():
     module = AnsibleModule(
         argument_spec=dict(
+            server_name=dict(required=True, type='str'),
             logfiles=dict(required=True, type='list', elements='path'),
             anonymous=dict(required=False, type='bool', default=False),
             output_file=dict(required=True, type='str')
