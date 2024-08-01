@@ -23,6 +23,7 @@
 
 - name: Analyze replication logs and write to file for each log file
   ds389_log_parser:
+    server_name: "{{ inventory_hostname }}"
     logfiles: "{{ log_files.files | map(attribute='path') | list }}"
     anonymous: true
     output_file: "{{ ds389_repl_monitoring_tmp_analysis_output_file_path }}"

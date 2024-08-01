@@ -114,6 +114,7 @@ import os
 import plotly.graph_objs as go
 import plotly.io as pio
 
+
 class CsnInfo:
     def __init__(self, csn, tz):
         self.csn = csn
@@ -122,12 +123,15 @@ class CsnInfo:
         self.lag_time = None
         self.etime = None
         self.replicated_on = {}
+        self.csn_history = []
 
     def json_parse(self, idx, json_dict):
         self.replicated_on[idx] = json_dict
+        server_name = json_dict['server_name']
         udt = json_dict['logtime']
         etime = float(json_dict['etime'])
         self._update_times(udt, etime, idx)
+        self.csn_history.append((server_name, udt))
 
     def _update_times(self, udt, etime, idx):
         if self.oldest_time is None or self.oldest_time[0] > udt:
@@ -268,6 +272,7 @@ class LagInfo:
 
         module.log("PNG plot generated successfully")
 
+
     def plot_interactive_html(self, module):
         if not self.lag:
             module.fail_json(msg="No data available to plot.")
@@ -278,10 +283,16 @@ class LagInfo:
         xdata = [self.date_from_udt(i.oldest_time[0]) for i in self.lag]
         ydata = [i.lag_time[0] for i in self.lag]
         edata = [i.etime[0] for i in self.lag]
-        csn_hover_text = [f"CSN: {i.csn}<br>Described: {i.describe_csn()}<br>Time: {xdata[idx].strftime('%Y-%m-%d %H:%M:%S')}" for idx, i in enumerate(self.lag)]
 
-        trace1 = go.Scatter(x=xdata, y=ydata, mode='lines+markers', name='Replication Lag', text=csn_hover_text, hoverinfo='text+x+y')
-        trace2 = go.Scatter(x=xdata, y=edata, mode='lines+markers', name='Elapsed Time', text=csn_hover_text, hoverinfo='text+x+y')
+        # Generate CSN history text
+        csn_history_text = []
+        for csninfo in self.lag:
+            history = "<br>".join([f"'Server {server_name}' - {self.date_from_udt(udt).strftime('%Y-%m-%d %H:%M:%S')}"
+                                   for server_name, udt in sorted(csninfo.csn_history, key=lambda x: x[1])])
+            csn_history_text.append(f"CSN: {csninfo.csn} - {csninfo.describe_csn()} - <br>History:<br>{history}")
+
+        trace1 = go.Scatter(x=xdata, y=ydata, mode='lines+markers', name='Replication Lag', text=csn_history_text, hoverinfo='text+x+y')
+        trace2 = go.Scatter(x=xdata, y=edata, mode='lines+markers', name='Elapsed Time', text=csn_history_text, hoverinfo='text+x+y')
 
         layout = go.Layout(
             title='Replication Lag Time',
@@ -328,12 +339,8 @@ class LagInfo:
                 var infotext = data.points.map(function(d) {
                     return d.text;
                 });
-                var csn = infotext[0].replace('CSN: ', '').split('<br>')[0];
-                navigator.clipboard.writeText(csn).then(function() {
-                    alert('CSN ' + csn + ' copied to clipboard');
-                }, function(err) {
-                    console.error('Could not copy text: ', err);
-                });
+                var csnHistory = infotext[0];
+                alert(csnHistory);
             });
         });
         </script>
