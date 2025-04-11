@@ -51,3 +51,15 @@ provisioner:
         ds389_repl_monitoring_tmp_path: "/tmp"
         ds389_repl_monitoring_tmp_analysis_output_file_path: "{{ ds389_repl_monitoring_tmp_path }}/{{ inventory_hostname }}_analysis_output.json"
         ds389_repl_monitoring_tmp_merged_output_file_path: "{{ ds389_repl_monitoring_tmp_path }}/merged_output.json"
+
+  # Pre-installation steps
+  config_options:
+    defaults:
+      interpreter_python: auto_silent
+    privilege_escalation:
+      become: true
+  lint:
+    name: ansible-lint
+  prepare:
+    prepare_command: |
+      dnf install -y python3-lib389 python3-matplotlib

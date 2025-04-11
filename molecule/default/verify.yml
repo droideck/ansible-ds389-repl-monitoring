@@ -15,6 +15,7 @@
           loop:
             - python3
             - python3-matplotlib
+            - python3-lib389
           register: package_status
           failed_when: package_status is failed
 

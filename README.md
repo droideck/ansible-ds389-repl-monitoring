@@ -14,6 +14,7 @@ Also, the tool has not been fully tested for possible security issues, AND its r
 
 - Ansible 2.9 or later
 - Python 3.6 or later
+- lib389 Python library
 - Access 389 Directory Server's access log files with appropriate read permissions
 
 ## Installation
@@ -44,7 +45,7 @@ all:
         ds389_instance_1:
           ansible_host: 192.168.2.101
           ds389_repl_monitoring_log_dir: '/var/log/dirsrv/slapd-supplier1'
-        ds389_instance_2:  
+        ds389_instance_2:
           ansible_host: 192.168.2.102
           ds389_repl_monitoring_log_dir: '/var/log/dirsrv/slapd-supplier2'
 ```
