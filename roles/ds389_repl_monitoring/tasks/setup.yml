@@ -2,15 +2,26 @@
   block:
     - name: Test connectivity to all hosts
       ansible.builtin.ping:
+    - name: Ensure necessary packages are installed on the remote hosts
+      become: true
+      ansible.builtin.dnf:
+        name:
+          - python3
+          - python3-ldap
+          - python3-lib389
+          - python3-matplotlib
+          - python3-plotly
+        state: present
     - name: Ensure necessary packages are installed on the controller
       become: true
       ansible.builtin.package:
-        name: "{{ item }}"
+        name:
+          - python3
+          - python3-matplotlib
+          - python3-lib389
+          - python3-ldap
+          - python3-plotly
         state: present
-      with_items:
-        - python3
-        - python3-matplotlib
-        - python3-lib389
       delegate_to: localhost
       when: ansible_os_family == "RedHat"
       run_once: true
