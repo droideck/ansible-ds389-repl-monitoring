@@ -23,9 +23,9 @@ ds389_repl_monitoring_lag_time_lowest: 0
 # Changes with an execution time lower than this value will be excluded from the monitoring results
 ds389_repl_monitoring_etime_lowest: 0
 
-# UTC offset in seconds for timezone adjustment
-# This value will be used to adjust the log timestamps to the desired timezone
-ds389_repl_monitoring_utc_offset: 0
+# UTC offset in timezone format ±HHMM for timezone adjustment
+# This value will be used to adjust the log timestamps to the desired timezone (e.g., "+0000", "+0100", "-0500")
+ds389_repl_monitoring_utc_offset: "+0000"
 
 # Temporary directory path for storing intermediate files
 # This directory will be used to store temporary files generated during the monitoring process
@@ -48,3 +48,7 @@ ds389_repl_monitoring_tmp_merged_output_file_path: "{{ ds389_repl_monitoring_tmp
 # Force generation of plots even if replication lag files already exist for the current hour
 # Use this only for tuning the plot generation parameters. The production use case should have this set to false
 ds389_repl_monitoring_force_replace_existing: false
+
+# List of suffixes to monitor for replication
+# Each suffix should be in the format "dc=example,dc=com"
+ds389_repl_monitoring_suffixes: []

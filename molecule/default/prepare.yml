@@ -1,6 +1,17 @@
 - name: Prepare
   hosts: all
+  become: true
   tasks:
+    - name: Install required packages
+      ansible.builtin.dnf:
+        name:
+          - python3
+          - python3-ldap
+          - python3-lib389
+          - python3-matplotlib
+          - python3-plotly
+        state: present
+
     - name: Copy mock accesslog files to the respective test containers
       ansible.builtin.copy:
         src: "./files/mock_accesslog{{ hostvars[inventory_hostname].ansible_hostname | regex_replace('^instance', '') }}"

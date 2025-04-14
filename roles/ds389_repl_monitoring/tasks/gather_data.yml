@@ -27,6 +27,7 @@
     logfiles: "{{ log_files.files | map(attribute='path') | list }}"
     anonymous: true
     output_file: "{{ ds389_repl_monitoring_tmp_analysis_output_file_path }}"
+    suffixes: "{{ ds389_repl_monitoring_suffixes }}"
   loop: "{{ log_files.files }}"
   loop_control:
     loop_var: log_file

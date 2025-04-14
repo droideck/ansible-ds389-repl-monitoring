@@ -33,6 +33,7 @@
     repl_lag_threshold: "{{ ds389_repl_monitoring_lag_threshold }}"
     start_time: "{{ ds389_repl_monitoring_start_time }}"
     end_time: "{{ ds389_repl_monitoring_end_time }}"
+    suffixes: "{{ ds389_repl_monitoring_suffixes }}"
   delegate_to: localhost
   run_once: true
   when: not replication_lag_files.stat.exists or ds389_repl_monitoring_force_replace_existing
