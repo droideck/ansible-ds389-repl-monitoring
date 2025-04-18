@@ -125,7 +125,139 @@ import tempfile
 import sys
 import ldap
 from datetime import datetime, timezone, tzinfo, timedelta
-from typing import Dict, List, Optional, Tuple, Any, Union
+from typing import Dict, List, Optional, Tuple, Any, Union, NamedTuple
+
+# For plotly visualization
+try:
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+    import plotly.io as pio
+    PLOTLY_AVAILABLE = True
+except ImportError:
+    PLOTLY_AVAILABLE = False
+
+# For PNG output with matplotlib
+try:
+    import matplotlib.pyplot as plt
+    import matplotlib.dates as mdates
+    MATPLOTLIB_AVAILABLE = True
+except ImportError:
+    MATPLOTLIB_AVAILABLE = False
+
+from collections import defaultdict
+import csv
+from collections.abc import Generator
+
+
+# Define fallback classes for when lib389 is not available
+class ChartDataFallback(NamedTuple):
+    """Container for chart data series."""
+    times: List[datetime]
+    lags: List[float]
+    durations: List[float]
+    hover: List[str]
+
+
+class VisualizationHelperFallback:
+    """Helper class for visualization-related functionality."""
+
+    @staticmethod
+    def generate_color_palette(num_colors: int) -> List[str]:
+        """Generate a visually pleasing color palette.
+
+        :param num_colors: Number of colors needed
+        :returns: List of rgba color strings
+        """
+        colors = []
+        for i in range(num_colors):
+            hue = i / num_colors
+            saturation = 0.7
+            value = 0.9
+
+            # Convert HSV to RGB
+            c = value * saturation
+            x = c * (1 - abs((hue * 6) % 2 - 1))
+            m = value - c
+
+            h_sector = int(hue * 6)
+            if h_sector == 0:
+                r, g, b = c, x, 0
+            elif h_sector == 1:
+                r, g, b = x, c, 0
+            elif h_sector == 2:
+                r, g, b = 0, c, x
+            elif h_sector == 3:
+                r, g, b = 0, x, c
+            elif h_sector == 4:
+                r, g, b = x, 0, c
+            else:
+                r, g, b = c, 0, x
+
+            # Convert to RGB values
+            rgb = [int((val + m) * 255) for val in (r, g, b)]
+            colors.append(f'rgba({rgb[0]},{rgb[1]},{rgb[2]},0.8)')
+
+        return colors
+
+    @staticmethod
+    def prepare_chart_data(csns: Dict[str, Dict[Union[int, str], Dict[str, Any]]]) -> Dict[Tuple[str, str], ChartDataFallback]:
+        """Prepare data for visualization."""
+        chart_data = defaultdict(lambda: {
+            'times': [], 'lags': [], 'durations': [], 'hover': []
+        })
+
+        for csn, server_map in csns.items():
+            # Gather only valid records (dict, not '__hop_lags__', must have 'logtime')
+            valid_records = [
+                rec for key, rec in server_map.items()
+                if isinstance(rec, dict)
+                   and key != '__hop_lags__'
+                   and 'logtime' in rec
+            ]
+            if not valid_records:
+                continue
+
+            # Compute global lag for this CSN (earliest vs. latest among valid records)
+            t_list = [rec['logtime'] for rec in valid_records]
+            earliest = min(t_list)
+            latest = max(t_list)
+            lag_val = latest - earliest
+
+            # Populate chart data for each server record
+            for rec in valid_records:
+                suffix_val = rec.get('suffix', 'unknown')
+                server_val = rec.get('server_name', 'unknown')
+
+                # Convert numeric UTC to a datetime
+                ts_dt = datetime.fromtimestamp(rec['logtime'])
+
+                # Operation duration, defaulting to 0.0 if missing
+                duration_val = float(rec.get('duration', 0.0))
+
+                # Build the ChartData slot
+                data_slot = chart_data[(suffix_val, server_val)]
+                data_slot['times'].append(ts_dt)
+                data_slot['lags'].append(lag_val)  # The same global-lag for all servers
+                data_slot['durations'].append(duration_val)
+                data_slot['hover'].append(
+                    f"CSN: {csn}<br>"
+                    f"Server: {server_val}<br>"
+                    f"Suffix: {suffix_val}<br>"
+                    f"Target DN: {rec.get('target_dn', '')}<br>"
+                    f"Lag Time: {lag_val:.3f}s<br>"
+                    f"Duration: {duration_val:.3f}s"
+                )
+
+        # Convert the dict-of-lists into your namedtuple-based ChartData
+        return {
+            key: ChartDataFallback(
+                times=value['times'],
+                lags=value['lags'],
+                durations=value['durations'],
+                hover=value['hover']
+            )
+            for key, value in chart_data.items()
+        }
 
 
 class ReplicationLogAnalyzerFallback:
@@ -451,10 +583,10 @@ class ReplicationLogAnalyzerFallback:
                 server_suffix_pairs.add((suffix_val, srv_val))
 
         # Generate colors
-        colors = VisualizationHelper.generate_color_palette(len(server_suffix_pairs))
+        colors = VisualizationHelperFallback.generate_color_palette(len(server_suffix_pairs))
 
         # Prepare chart data for the first two subplots
-        chart_data = VisualizationHelper.prepare_chart_data(self.csns)
+        chart_data = VisualizationHelperFallback.prepare_chart_data(self.csns)
 
         # Plot Per-Hop Lags in row=3 (for HTML usage)
         for csn, server_map in self.csns.items():
@@ -838,14 +970,14 @@ class ReplicationLogAnalyzerFallback:
     def _generate_patternfly_json(self, results: Dict[str, Any], outfile: str) -> None:
         """Generate JSON specifically formatted for PatternFly 5 charts."""
         # Prepare chart data using the visualization helper
-        chart_data = VisualizationHelper.prepare_chart_data(self.csns)
+        chart_data = VisualizationHelperFallback.prepare_chart_data(self.csns)
 
         # Create a structure for PatternFly 5 scatter-line chart
         series_data = []
 
         # Create a color palette for consistent coloring
         all_keys = list(chart_data.keys())
-        color_palette = VisualizationHelper.generate_color_palette(len(all_keys))
+        color_palette = VisualizationHelperFallback.generate_color_palette(len(all_keys))
 
         for idx, ((suffix, server_name), data) in enumerate(chart_data.items()):
             # Skip if no data points
@@ -914,7 +1046,7 @@ class ReplicationLogAnalyzerFallback:
                 )
 
         # Generate color palette for hop data
-        hop_color_palette = VisualizationHelper.generate_color_palette(len(hop_data))
+        hop_color_palette = VisualizationHelperFallback.generate_color_palette(len(hop_data))
 
         # Create hop series data
         for idx, (key, data) in enumerate(hop_data.items()):
@@ -983,27 +1115,6 @@ class ReplicationLogAnalyzerFallback:
                 json.dump(pf_data, f, indent=4, default=str)
         except Exception as e:
             raise IOError(f"Failed to write PatternFly JSON to {outfile}: {e}")
-# Try to import lib389 first
-try:
-    from lib389.repltools import ReplicationLogAnalyzer
-    LIB389_AVAILABLE = True
-except ImportError:
-    ReplicationLogAnalyzer = ReplicationLogAnalyzerFallback
-    LIB389_AVAILABLE = False
-    logging.getLogger(__name__).warning("lib389 is not available. Using fallback implementation.")
-
-try:
-    import plotly
-    PLOTLY_AVAILABLE = True
-except ImportError:
-    PLOTLY_AVAILABLE = False
-
-try:
-    import matplotlib
-    MATPLOTLIB_AVAILABLE = True
-except ImportError:
-    MATPLOTLIB_AVAILABLE = False
-
 
 class InputAdapter:
     """
@@ -1063,6 +1174,14 @@ def convert_to_timezone(dt_string, utc_offset="+0000"):
     except ValueError:
         return None
 
+# Try to import lib389 first
+try:
+    from lib389.repltools import ReplicationLogAnalyzer
+    LIB389_AVAILABLE = True
+except ImportError:
+    ReplicationLogAnalyzer = ReplicationLogAnalyzerFallback
+    LIB389_AVAILABLE = False
+    logging.getLogger(__name__).warning("lib389 is not available. Using fallback implementation.")
 
 def main():
     module = AnsibleModule(
@@ -1151,6 +1270,30 @@ def main():
         # Instead of parsing the logs, we'll directly set the CSN data
         # This is needed because we already have the parsed data in Ansible format
         analyzer.csns = csns
+
+        if json_data.get('start-time'):
+            try:
+                analyzer.start_dt = datetime.fromisoformat(json_data['start-time'])
+                analyzer.start_udt = json_data.get('utc-start-time', analyzer.start_dt.timestamp())
+            except (ValueError, TypeError) as e:
+                module.warn(f"Could not parse start-time from input: {e}")
+                # Fallback: use the earliest timestamp from the CSN data
+                try:
+                    earliest_time = float('inf')
+                    for csn, server_map in csns.items():
+                        for _, record in server_map.items():
+                            if isinstance(record, dict) and 'logtime' in record:
+                                earliest_time = min(earliest_time, record['logtime'])
+
+                    if earliest_time != float('inf'):
+                        analyzer.start_dt = datetime.fromtimestamp(earliest_time)
+                        analyzer.start_udt = earliest_time
+                    else:
+                        analyzer.start_dt = datetime.now()
+                        analyzer.start_udt = analyzer.start_dt.timestamp()
+                except Exception:
+                    analyzer.start_dt = datetime.now()
+                    analyzer.start_udt = analyzer.start_dt.timestamp()
 
         # Determine the report formats
         formats = []
